@@ -1,27 +1,27 @@
-// 1. DATABASE STATIS - Harga sudah diperbarui (Standard: 550rb, AC: 600rb)
+// 1. DATABASE STATIS - Harga & Posisi Sukaharja Karawang
 const dataKontrakan = [
     {
         id: 1,
         nama: "Kosan Pak David - Kamar Standard",
         harga: "Rp 550.000 / bulan",
         fasilitas: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi",
-        lat: -6.3128,  // ⚠️ GANTI dengan Latitude asli lokasi Kosan Pak David
-        lng: 107.2945, // ⚠️ GANTI dengan Longitude asli lokasi Kosan Pak David
-        whatsapp: "6281234567890" // Ganti dengan nomor WhatsApp Pak David diawali 62
+        lat: -6.3235,  // 📌 Koordinat Sukaharja Karawang (Silakan sesuaikan detailnya jika perlu)
+        lng: 107.3155, // 📌 Koordinat Sukaharja Karawang
+        whatsapp: "6283157363740" // Ganti dengan nomor WhatsApp Pak David aktif
     },
     {
         id: 2,
         nama: "Kosan Pak David - Kamar Ber-AC",
         harga: "Rp 600.000 / bulan",
         fasilitas: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi",
-        lat: -6.3128,  // ⚠️ SAMAKAN dengan Latitude di atas agar tidak nyasar
-        lng: 107.2945, // ⚠️ SAMAKAN dengan Longitude di atas agar tidak nyasar
-        whatsapp: "6281234567890" 
+        lat: -6.3235,  // Disamakan agar pin menumpuk di area bangunan yang sama
+        lng: 107.3155, 
+        whatsapp: "6283157363740" 
     }
 ];
 
 // 2. INISIALISASI PETA LEAFLET
-const map = L.map('map').setView([dataKontrakan[0].lat, dataKontrakan[0].lng], 14);
+const map = L.map('map').setView([dataKontrakan[0].lat, dataKontrakan[0].lng], 16); // Zoom ditingkatkan ke 16 agar lebih dekat
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -29,7 +29,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // 3. MENAMPILKAN DATA KE MARKS PETA & KARTU DAFTAR
 const containerDaftar = document.getElementById('daftar-kontrakan');
-containerDaftar.innerHTML = ''; // Membersihkan sisa data lama
+containerDaftar.innerHTML = ''; 
 
 dataKontrakan.forEach(unit => {
     // A. Menempelkan PIN / Marker ke Peta
@@ -68,7 +68,7 @@ dataKontrakan.forEach(unit => {
 
 // 4. FUNGSI NAVIGASI PETA INTERAKTIF
 function fokusPeta(lat, lng) {
-    map.setView([lat, lng], 16);
+    map.setView([lat, lng], 17);
     document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
