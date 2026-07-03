@@ -3,73 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SewaKontrakan Maps - Cari Lokasi Hunian</title>
+    <title>KontrakanMaps - Cari Lokasi Kontrakan</title>
+    <!-- Tailwind CSS untuk Desain -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- Leaflet CSS untuk Peta -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style> #map { height: 420px; width: 100%; z-index: 10; } </style>
+    <style>
+        #map { height: 450px; width: 100%; border-radius: 0.75rem; }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans antialiased text-gray-900">
+<body class="bg-gray-50 font-sans">
 
-    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
-            <div class="flex items-center gap-2">
-                <span class="p-2 bg-indigo-600 text-white rounded-xl shadow-md"><i class="fa-solid fa-map-location-dot text-xl"></i></span>
-                <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">KontrakanMaps</span>
-            </div>
-            <span class="text-xs text-gray-400 font-medium">Lokasi Realtime Karawang 📍</span>
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm p-4 mb-6 border-b border-gray-100">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-indigo-600 flex items-center gap-2">
+                📍 KontrakanMaps
+            </h1>
+            <span class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                Lokasi Realtime Karawang 📌
+            </span>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="flex items-center gap-2 mb-2 px-2 text-sm font-bold text-gray-700">
-                <i class="fa-solid fa-earth-asia text-indigo-500 animate-pulse"></i> Eksplorasi Geografis Kontrakan Terdekat
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12">
+        
+        <!-- Kolom Kiri: Peta & Rekomendasi -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Wadah Peta -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <div id="map" class="shadow-inner z-10"></div>
             </div>
-            <div id="map" class="rounded-xl border border-gray-200"></div>
-        </div>
-    </div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
-        <div class="lg:col-span-2 space-y-4">
-            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <span class="w-1.5 h-5 bg-indigo-600 rounded-full"></span> Unit Rekomendasi
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="properties-list"></div>
-        </div>
-
-        <div class="lg:col-span-1">
-            <div id="booking-section" class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm sticky top-24">
-                <h2 class="text-lg font-bold mb-4 pb-3 border-b border-gray-100 flex items-center gap-2 text-gray-800">
-                    <i class="fa-solid fa-file-contract text-indigo-600"></i> Form Booking Survei
+            <!-- Daftar Unit Rekomendasi -->
+            <div>
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-indigo-600 pl-2">
+                    Unit Rekomendasi Kontrakan
                 </h2>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 mb-1">Unit Terpilih</label>
-                        <div id="selected-property-display" class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm text-gray-400 italic">Klik tombol "Lihat & Sewa" pada unit</div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 mb-1">Nama Anda</label>
-                        <input type="text" id="tenant-name" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 mb-1">No. WhatsApp</label>
-                        <input type="tel" id="tenant-phone" placeholder="Contoh: 0812345..." class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-                        <span class="text-gray-500 text-sm">Tarif Bulanan</span>
-                        <span class="text-xl font-extrabold text-indigo-600">Rp <span id="booking-price">0</span></span>
-                    </div>
-                    <button id="submit-booking-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md">
-                        Kirim Pengajuan Ke WhatsApp
-                    </button>
+                <div id="daftar-kontrakan" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Data otomatis diisi oleh index.js -->
                 </div>
             </div>
         </div>
+
+        <!-- Kolom Kanan: Form Booking -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-fit sticky top-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                📋 Form Booking Survei
+            </h2>
+            <form id="form-booking" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Unit Terpilih</label>
+                    <input type="text" id="unit-terpilih" readonly 
+                        class="w-full p-2.5 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 font-medium outline-none" 
+                        placeholder="Klik tombol 'Sewa & Survei' pada unit">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Anda</label>
+                    <input type="text" id="nama-pencari" required 
+                        class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
+                        placeholder="Masukkan nama lengkap">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">No. WhatsApp Anda</label>
+                    <input type="tel" id="wa-pencari" placeholder="Contoh: 08123456xxx" required 
+                        class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-3 rounded-lg transition-colors shadow-sm mt-2">
+                    Kirim via WhatsApp ke Pemilik
+                </button>
+            </form>
+        </div>
+
     </main>
 
+    <!-- Leaflet JS untuk Peta -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Berkas Logika JavaScript -->
     <script src="index.js"></script>
 </body>
 </html>
