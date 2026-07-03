@@ -3,7 +3,7 @@ const dataKontrakan = [
     {
         id: 1,
         nama: "Kosan Pak David - Kamar Standard A",
-        harga: "Rp 800.000 / bulan",
+        harga: "Rp 550.000 / bulan",
         fasilitas: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi",
         lat: -6.3128,  // Ubah angka ini sesuai dengan Latitude asli lokasi Kosan Pak David
         lng: 107.2945, // Ubah angka ini sesuai dengan Longitude asli lokasi Kosan Pak David
@@ -12,7 +12,7 @@ const dataKontrakan = [
     {
         id: 2,
         nama: "Kosan Pak David - Kamar AC Eksklusif",
-        harga: "Rp 1.200.000 / bulan",
+        harga: "Rp 600.000 / bulan",
         fasilitas: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi",
         lat: -6.3150,  // Koordinat untuk unit kedua (jika ada)
         lng: 107.2990,
