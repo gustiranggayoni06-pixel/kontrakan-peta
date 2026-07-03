@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Control Admin Kontrakan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link class="js-leaflet-css" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style> #admin-map { height: 200px; width: 100%; z-index: 5; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="login-box" class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
+        <div class="text-center mb-6">
+            <i class="fa-solid fa-lock-open text-3xl text-indigo-400 mb-2"></i>
+            <h2 class="text-2xl font-bold">Admin Login</h2>
+            <p class="text-xs text-slate-400 mt-1">Gunakan akun default untuk masuk</p>
+        </div>
+        <form id="login-form" class="space-y-4">
+            <input type="text" id="username" placeholder="Username (admin)" class="w-full bg-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none border border-transparent focus:border-indigo-500 text-sm" required>
+            <input type="password" id="password" placeholder="Password (password123)" class="w-full bg-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none border border-transparent focus:border-indigo-500 text-sm" required>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl font-bold text-sm transition shadow-lg">Masuk Dashboard</button>
+        </form>
+    </div>
+
+    <div id="admin-dashboard" class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-7xl border border-slate-700 hidden">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
+            <div>
+                <h2 class="text-xl font-extrabold text-white flex items-center gap-2">🏠 Panel Kendali Kontrakan</h2>
+                <p class="text-xs text-slate-400">Atur unit kontrakan & koordinat peta disini</p>
+            </div>
+            <button onclick="window.location.reload()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md">Logout</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="space-y-4">
+                <!-- Ganti bagian Form di admin.html Anda dengan ini -->
+<form id="add-property-form" class="space-y-3 bg-slate-900/50 p-4 rounded-xl border border-slate-700">
+    <h3 class="font-bold text-sm text-indigo-400 mb-1"><i class="fa-solid fa-circle-plus"></i> Pasang Iklan Baru (Lokasi Permanen)</h3>
+    
+    <input type="text" id="prop-name" placeholder="Nama Kontrakan / No Kamar" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600" required>
+    
+    <input type="number" id="prop-price" placeholder="Harga Sewa Bulanan (Rp)" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600" required>
+    
+    <select id="prop-category" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600">
+        <option value="1-kamar">Tipe 1 Kamar</option>
+        <option value="paviliun">Tipe Paviliun</option>
+        <option value="rumah-full">Rumah Penuh</option>
+    </select>
+    
+    <textarea id="prop-desc" placeholder="Deskripsi & fasilitas..." rows="2" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600"></textarea>
+    
+    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 py-2 rounded-xl text-xs font-bold text-white transition shadow-md">Publish Unit Baru</button>
+</form>
+
+<!-- Live Map Preview (Tetap dipertahankan untuk melihat titik permanen) -->
+<div class="bg-slate-900/40 p-2 rounded-xl border border-slate-700">
+    <p class="text-[11px] font-bold text-slate-400 mb-1.5"><i class="fa-solid fa-map-pin text-indigo-400"></i> Lokasi Permanen Kontrakan:</p>
+    <div id="admin-map" class="rounded-lg overflow-hidden border border-slate-600"></div>
+</div>
+
+                <div class="bg-slate-900/40 p-2 rounded-xl border border-slate-700">
+                    <p class="text-[11px] font-bold text-slate-400 mb-1.5"><i class="fa-solid fa-map-pin text-indigo-400"></i> Deteksi Alamat Live di Map:</p>
+                    <div id="admin-map" class="rounded-lg overflow-hidden border border-slate-600"></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <h3 class="font-bold text-sm text-amber-400 mb-3"><i class="fa-solid fa-warehouse"></i> Inventori Unit Kontrakan</h3>
+                <div id="admin-properties-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[520px] overflow-y-auto pr-1"></div>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-sm text-sky-400 mb-3"><i class="fa-solid fa-bell"></i> Pengajuan Survei Masuk</h3>
+                <div id="admin-bookings-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

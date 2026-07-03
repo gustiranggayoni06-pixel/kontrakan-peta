@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SewaKontrakan Maps - Cari Lokasi Hunian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style> #map { height: 420px; width: 100%; z-index: 10; } </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-900">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center gap-2">
+                <span class="p-2 bg-indigo-600 text-white rounded-xl shadow-md"><i class="fa-solid fa-map-location-dot text-xl"></i></span>
+                <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">KontrakanMaps</span>
+            </div>
+            <span class="text-xs text-gray-400 font-medium">Lokasi Realtime Karawang 📍</span>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="flex items-center gap-2 mb-2 px-2 text-sm font-bold text-gray-700">
+                <i class="fa-solid fa-earth-asia text-indigo-500 animate-pulse"></i> Eksplorasi Geografis Kontrakan Terdekat
+            </div>
+            <div id="map" class="rounded-xl border border-gray-200"></div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+        <div class="lg:col-span-2 space-y-4">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-indigo-600 rounded-full"></span> Unit Rekomendasi
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="properties-list"></div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div id="booking-section" class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm sticky top-24">
+                <h2 class="text-lg font-bold mb-4 pb-3 border-b border-gray-100 flex items-center gap-2 text-gray-800">
+                    <i class="fa-solid fa-file-contract text-indigo-600"></i> Form Booking Survei
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Unit Terpilih</label>
+                        <div id="selected-property-display" class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm text-gray-400 italic">Klik tombol "Lihat & Sewa" pada unit</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Nama Anda</label>
+                        <input type="text" id="tenant-name" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">No. WhatsApp</label>
+                        <input type="tel" id="tenant-phone" placeholder="Contoh: 0812345..." class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                        <span class="text-gray-500 text-sm">Tarif Bulanan</span>
+                        <span class="text-xl font-extrabold text-indigo-600">Rp <span id="booking-price">0</span></span>
+                    </div>
+                    <button id="submit-booking-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md">
+                        Kirim Pengajuan Ke WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="index.js"></script>
+</body>
+</html>
