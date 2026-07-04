@@ -86,6 +86,122 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="index.js"></script>
+    <script>
+    // INI PENGGANTI index.js - LANGSUNG DI HTML
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. INIT MAP KARAWANG
+        const map = L.map('map').setView([-6.3227, 107.3376], 13); // Koordinat Karawang
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        const listContainer = document.getElementById('properties-list');
+        const modal = document.getElementById('detail-modal');
+        const formBooking = document.getElementById('booking-form-wa');
+        const inputUnitTerpilih = document.getElementById('unit-terpilih');
+
+        // 2. AMBIL DATA DARI ADMIN PANEL - localStorage
+        let properties = JSON.parse(localStorage.getItem('kontrakanData')) || [];
+
+        // Kalo kosong, kasih data dummy biar nggak blank
+        if (properties.length === 0) {
+            properties = [
+                {
+                    id: 1,
+                    name: "Kamar AC No 05 - Contoh",
+                    price: "650000",
+                    category: "Kamar Mandi Dalam + AC",
+                    desc: "Kasur, Lemari, Listrik Token, WiFi, Parkir Motor",
+                    images: ["https://placehold.co/600x400/4f46e5/white?text=Foto+Kontrakan"],
+                    lat: -6.325,
+                    lng: 107.340
+                }
+            ];
+        }
+
+        // 3. RENDER LIST + MARKER MAP
+        function renderProperties() {
+            listContainer.innerHTML = '';
+
+            properties.forEach(prop => {
+                // Tambah marker ke map
+                const marker = L.marker([prop.lat || -6.3227, prop.lng || 107.3376]).addTo(map);
+                marker.bindPopup(`<b>${prop.name}</b><br>Rp ${Number(prop.price).toLocaleString('id-ID')}/bulan`);
+
+                // Bikin card unit
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden';
+                card.innerHTML = `
+                    <img src="${prop.images[0]}" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <p class="text-xs text-indigo-600 font-bold">${prop.category}</p>
+                        <h3 class="font-bold text-slate-800 text-sm mt-1 mb-2 truncate">${prop.name}</h3>
+                        <p class="text-lg font-black text-emerald-600 mb-3">Rp ${Number(prop.price).toLocaleString('id-ID')}<span class="text-xs text-slate-500 font-normal">/bulan</span></p>
+                        <div class="flex gap-2">
+                            <button onclick="bukaModal(${prop.id})" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-lg">Detail</button>
+                            <button onclick="pilihUnit('${prop.name}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-lg">Sewa</button>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        // 4. FUNGSI BUKA MODAL DETAIL
+        window.bukaModal = (id) => {
+            const prop = properties.find(p => p.id === id);
+            if (!prop) return;
+
+            document.getElementById('modal-title').textContent = prop.name;
+            document.getElementById('modal-category').textContent = prop.category;
+            document.getElementById('modal-price').textContent = `Rp ${Number(prop.price).toLocaleString('id-ID')} / bulan`;
+            document.getElementById('modal-desc').textContent = prop.desc;
+
+            // Gallery foto
+            const gallery = document.getElementById('modal-gallery');
+            gallery.innerHTML = '';
+            prop.images.forEach(img => {
+                gallery.innerHTML += `<img src="${img}" class="w-full h-28 object-cover rounded-lg">`;
+            });
+
+            // Tombol booking di modal
+            document.getElementById('modal-btn-booking').onclick = () => {
+                pilihUnit(prop.name);
+                tutupModal();
+                document.getElementById('form-booking').scrollIntoView({ behavior: 'smooth' });
+            };
+
+            modal.classList.remove('hidden');
+        };
+
+        // 5. FUNGSI TUTUP MODAL
+        window.tutupModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        // 6. FUNGSI PILIH UNIT BUAT BOOKING
+        window.pilihUnit = (namaUnit) => {
+            inputUnitTerpilih.value = namaUnit;
+            document.getElementById('form-booking').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // 7. SUBMIT FORM KE WA
+        formBooking.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const unit = inputUnitTerpilih.value;
+            const nama = document.getElementById('tenant-name').value;
+            const hp = document.getElementById('tenant-phone').value;
+
+            if (!unit) return alert('Pilih unit dulu bang, klik tombol Sewa di unit');
+
+            const noPemilik = '6281234567890'; // GANTI NO WA PEMILIK DISINI
+            const pesan = `Halo, saya ${nama} mau booking/survei unit:\n\n*${unit}*\n\nNo WA saya: ${hp}\n\nMohon infonya ya. Terima kasih.`;
+            const urlWA = `https://wa.me/${noPemilik}?text=${encodeURIComponent(pesan)}`;
+
+            window.open(urlWA, '_blank');
+        });
+
+        // JALANKAN PERTAMA KALI
+        renderProperties();
+    });
+    </script>
 </body>
 </html>
