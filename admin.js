@@ -1,33 +1,27 @@
 const loginBox = document.getElementById('login-box');
 const adminDashboard = document.getElementById('admin-dashboard');
-let db;
+let globalProperties = [];
 
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "admin123";
 
-// Konek Ke Engine DB Gambar Berkapasitas Besar
-const request = indexedDB.open("KontrakanMapsDB", 1);
-request.onupgradeneeded = function(e) {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("properties")) {
-        db.createObjectStore("properties", { keyPath: "id" });
-    }
-};
-request.onsuccess = function(e) {
-    db = e.target.result;
-};
-
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    if (document.getElementById('username').value.trim() === ADMIN_USER && document.getElementById('password').value.trim() === ADMIN_PASS) {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        alert('Login Berhasil!');
         loginBox.classList.add('hidden');
         adminDashboard.classList.remove('hidden');
         loadAdminProperties();
-    } else { alert("Akun Salah!"); }
+    } else { 
+        alert("Username atau Password salah!"); 
+    }
 });
 
-// Helper Mengubah File Upload Jadi Teks Base64 String Aman
-function fileToBase64(file) {
+// Fungsi pembantu untuk mengubah file gambar menjadi data Teks (Base64)
+function convertFileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -37,72 +31,75 @@ function fileToBase64(file) {
 }
 
 function loadAdminProperties() {
-    const transaction = db.transaction(["properties"], "readonly");
-    const store = transaction.objectStore("properties");
-    const getAll = store.getAll();
+    const stored = localStorage.getItem('properties');
+    if (stored) {
+        globalProperties = JSON.parse(stored);
+    } else {
+        globalProperties = [];
+        localStorage.setItem('properties', JSON.stringify(globalProperties));
+    }
 
-    getAll.onsuccess = function() {
-        const listData = getAll.result;
-        const container = document.getElementById('admin-properties-list');
-        if(!container) return;
+    const container = document.getElementById('admin-properties-list');
+    if(container) {
         container.innerHTML = '';
-
-        listData.forEach(p => {
+        globalProperties.forEach(p => {
             container.innerHTML += `
                 <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600 flex flex-col gap-3 mb-3 text-left">
                     <div class="flex justify-between items-start gap-4">
                         <div>
                             <h3 class="font-bold text-sm text-white">${p.name}</h3>
-                            <p class="text-[11px] text-indigo-300">Total Foto Terupload: ${p.images ? p.images.length : 0} file gambar</p>
-                            <p class="text-xs text-emerald-400 font-bold mt-1">Rp ${Number(p.price).toLocaleString('id-ID')} / bulan</p>
+                            <p class="text-[11px] text-indigo-300">Kategori: ${p.category}</p>
+                            <p class="text-[11px] text-emerald-400 font-bold mt-1">Rp ${Number(p.price).toLocaleString('id-ID')} / bulan</p>
+                            <p class="text-[11px] text-amber-400 mt-0.5">📸 Total Foto: ${p.images ? p.images.length : 0} gambar</p>
                         </div>
                         <div class="flex gap-1.5">
-                            <button onclick="window.bukaModeEdit(${p.id})" class="bg-amber-500 text-slate-900 text-[11px] px-2.5 py-1 rounded font-bold">🛠️ Edit</button>
-                            <button onclick="window.deleteProperty(${p.id})" class="bg-red-500 text-white text-[11px] px-2.5 py-1 rounded font-bold">❌ Hapus</button>
+                            <button onclick="window.bukaModeEdit(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-[11px] px-2.5 py-1 rounded font-bold transition-all">🛠️ Edit</button>
+                            <button onclick="window.deleteProperty(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-[11px] px-2.5 py-1 rounded font-bold transition-all">❌ Hapus</button>
                         </div>
                     </div>
 
-                    <!-- FORM EDIT LENGKAP -->
                     <div id="edit-form-${p.id}" class="hidden bg-slate-800 p-3 rounded-lg border border-slate-500 space-y-2 mt-2">
                         <div>
-                            <label class="text-[10px] text-slate-400 block">Nama Unit:</label>
-                            <input type="text" id="edit-name-${p.id}" value="${p.name}" class="w-full bg-slate-700 text-xs p-2 rounded text-white focus:outline-none">
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Nama Kamar / Unit:</label>
+                            <input type="text" id="edit-name-${p.id}" value="${p.name}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-slate-400 block">Harga:</label>
-                            <input type="number" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-xs p-2 rounded text-white focus:outline-none">
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Harga Sewa Bulanan:</label>
+                            <input type="number" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-slate-400 block">Kategori:</label>
-                            <input type="text" id="edit-category-${p.id}" value="${p.category}" class="w-full bg-slate-700 text-xs p-2 rounded text-white focus:outline-none">
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Kategori:</label>
+                            <input type="text" id="edit-category-${p.id}" value="${p.category}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
                         </div>
+                        
                         <div>
-                            <label class="text-[10px] text-amber-400 font-bold block">Re-upload File Foto Baru (Biarkan kosong jika tidak ingin ganti foto):</label>
-                            <input type="file" id="edit-files-${p.id}" multiple accept="image/*" class="w-full bg-slate-700 text-xs p-1.5 rounded text-white focus:outline-none">
+                            <label class="text-[10px] text-amber-400 font-bold block mb-0.5">📤 Upload Foto Baru (Bisa pilih banyak foto, kosongkan jika tak ingin ganti):</label>
+                            <input type="file" id="edit-files-${p.id}" multiple accept="image/*" class="w-full bg-slate-700 text-white text-xs p-1 rounded border border-slate-500 focus:outline-none">
                         </div>
+
                         <div>
-                            <label class="text-[10px] text-slate-400 block">Fasilitas:</label>
-                            <textarea id="edit-desc-${p.id}" class="w-full bg-slate-700 text-xs p-2 rounded text-white h-16 focus:outline-none">${p.desc}</textarea>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Fasilitas / Deskripsi:</label>
+                            <textarea id="edit-desc-${p.id}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 h-16 focus:outline-none">${p.desc}</textarea>
                         </div>
                         <div class="flex gap-2 justify-end pt-1">
-                            <button onclick="window.batalEdit(${p.id})" class="bg-slate-600 text-xs px-3 py-1 rounded">Batal</button>
-                            <button onclick="window.simpanHasilEdit(${p.id})" class="bg-emerald-600 text-xs px-3 py-1 rounded font-bold">💾 Simpan Perubahan</button>
+                            <button onclick="window.batalEdit(${p.id})" class="bg-slate-600 text-white text-xs px-3 py-1 rounded shadow">Batal</button>
+                            <button onclick="window.simpanHasilEdit(${p.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1 rounded font-bold shadow">💾 Simpan Perubahan</button>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-2 border-t border-slate-600/50 mt-1">
-                        <span class="text-[11px] text-slate-400">Status Kamar:</span>
-                        <select onchange="window.updatePropertyStatus(${p.id}, this.value)" class="bg-slate-600 text-xs rounded px-2 py-1 text-white focus:outline-none">
+                        <span class="text-[11px] text-slate-400">Status Kamar Saat Ini:</span>
+                        <select onchange="window.updatePropertyStatus(${p.id}, this.value)" class="bg-slate-600 text-white text-xs rounded px-2 py-1 focus:outline-none border border-slate-500">
                             <option value="Tersedia" ${p.status === 'Tersedia' ? 'selected' : ''}>Tersedia</option>
                             <option value="Penuh" ${p.status === 'Penuh' ? 'selected' : ''}>Penuh</option>
                         </select>
                     </div>
                 </div>`;
         });
-    };
+    }
 }
 
-// Handler Submit Tambah Unit dengan File Upload
+// === HANDLER PUBLISH UNIT BARU (TERMASUK MULTI UPLOAD FOTO) ===
 document.getElementById('add-property-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('prop-name').value.trim();
@@ -111,81 +108,91 @@ document.getElementById('add-property-form').addEventListener('submit', async (e
     const desc = document.getElementById('prop-desc').value.trim();
     const fileInput = document.getElementById('prop-files');
 
-    let images = [];
-    if (fileInput.files.length > 0) {
+    let base64Images = [];
+    
+    // Memproses konversi file gambar ke string teks
+    if (fileInput && fileInput.files.length > 0) {
         for (let i = 0; i < fileInput.files.length; i++) {
-            const base64Str = await fileToBase64(fileInput.files[i]);
-            images.push(base64Str);
+            try {
+                const base64Str = await convertFileToBase64(fileInput.files[i]);
+                base64Images.push(base64Str);
+            } catch (err) {
+                console.error("Gagal membaca file gambar", err);
+            }
         }
     }
 
-    const newUnit = { id: Date.now(), name, price, category, desc, images, status: "Tersedia" };
-    
-    const tx = db.transaction(["properties"], "readwrite");
-    tx.objectStore("properties").put(newUnit);
-    tx.oncomplete = () => {
-        document.getElementById('add-property-form').reset();
-        loadAdminProperties();
-        alert("Sukses! Unit & seluruh file foto berhasil dipublish.");
+    const newUnit = {
+        id: Date.now(),
+        name,
+        price,
+        category,
+        desc,
+        images: base64Images, // Array penampung file foto hasil upload
+        status: "Tersedia"
     };
+
+    globalProperties.push(newUnit);
+    localStorage.setItem('properties', JSON.stringify(globalProperties));
+    document.getElementById('add-property-form').reset();
+    loadAdminProperties();
+    alert("Unit baru beserta seluruh foto berhasil di-publish!");
 });
 
-window.bukaModeEdit = id => document.getElementById(`edit-form-${id}`).classList.remove('hidden');
-window.batalEdit = id => document.getElementById(`edit-form-${id}`).classList.add('hidden');
+window.bukaModeEdit = function(id) {
+    document.getElementById(`edit-form-${id}`).classList.remove('hidden');
+};
 
-// Handler Simpan Hasil Edit (Bisa Edit Keterangan & Upload Ulang Foto Baru)
+window.batalEdit = function(id) {
+    document.getElementById(`edit-form-${id}`).classList.add('hidden');
+};
+
+// === SIMPAN PERUBAHAN EDIT DATA DAN FOTO ===
 window.simpanHasilEdit = async function(id) {
-    const txRead = db.transaction(["properties"], "readonly");
-    const storeRead = txRead.objectStore("properties");
-    const getReq = storeRead.get(id);
+    const namaBaru = document.getElementById(`edit-name-${id}`).value.trim();
+    const hargaBaru = parseInt(document.getElementById(`edit-price-${id}`).value) || 0;
+    const kategoriBaru = document.getElementById(`edit-category-${id}`).value.trim();
+    const deskripsiBaru = document.getElementById(`edit-desc-${id}`).value.trim();
+    const fileInputEdit = document.getElementById(`edit-files-${id}`);
 
-    getReq.onsuccess = async function() {
-        let currentData = getReq.result;
-        if(!currentData) return;
-
-        currentData.name = document.getElementById(`edit-name-${id}`).value.trim();
-        currentData.price = parseInt(document.getElementById(`edit-price-${id}`).value) || 0;
-        currentData.category = document.getElementById(`edit-category-${id}`).value.trim();
-        currentData.desc = document.getElementById(`edit-desc-${id}`).value.trim();
-
-        const fileInput = document.getElementById(`edit-files-${id}`);
-        if(fileInput && fileInput.files.length > 0) {
-            let newImages = [];
-            for (let i = 0; i < fileInput.files.length; i++) {
-                const base64Str = await fileToBase64(fileInput.files[i]);
-                newImages.push(base64Str);
+    globalProperties = globalProperties.map(async (p) => {
+        if (p.id === id) {
+            let updatedImages = p.images || [];
+            
+            // Jika admin memasukkan/mengupload file foto baru saat edit
+            if (fileInputEdit && fileInputEdit.files.length > 0) {
+                updatedImages = []; // reset foto lama
+                for (let i = 0; i < fileInputEdit.files.length; i++) {
+                    const base64Str = await convertFileToBase64(fileInputEdit.files[i]);
+                    updatedImages.push(base64Str);
+                }
             }
-            currentData.images = newImages; // Ganti foto lama dengan yang baru diupload
-        }
 
-        const txWrite = db.transaction(["properties"], "readwrite");
-        txWrite.objectStore("properties").put(currentData);
-        txWrite.oncomplete = () => {
-            alert("Perubahan unit dan foto berhasil disimpan!");
-            loadAdminProperties();
-        };
-    };
+            return { ...p, name: namaBaru, price: hargaBaru, category: kategoriBaru, desc: deskripsiBaru, images: updatedImages };
+        }
+        return p;
+    });
+
+    // Menunggu seluruh proses enkripsi data gambar selesai
+    Promise.all(globalProperties).then(resultData => {
+        globalProperties = resultData;
+        localStorage.setItem('properties', JSON.stringify(globalProperties));
+        alert("Sukses! Perubahan data & foto berhasil diperbarui.");
+        loadAdminProperties();
+    });
 };
 
 window.updatePropertyStatus = function(id, newStatus) {
-    const txRead = db.transaction(["properties"], "readonly");
-    const storeRead = txRead.objectStore("properties");
-    const getReq = storeRead.get(id);
-
-    getReq.onsuccess = function() {
-        let data = getReq.result;
-        if(data) {
-            data.status = newStatus;
-            const txWrite = db.transaction(["properties"], "readwrite");
-            txWrite.objectStore("properties").put(data);
-        }
-    };
+    globalProperties = globalProperties.map(p => p.id === id ? { ...p, status: newStatus } : p);
+    localStorage.setItem('properties', JSON.stringify(globalProperties));
+    alert(`Status kamar berhasil diubah!`);
 };
 
 window.deleteProperty = function(id) {
-    if (confirm("Hapus unit ini permanen?")) {
-        const tx = db.transaction(["properties"], "readwrite");
-        tx.objectStore("properties").delete(id);
-        tx.oncomplete = () => loadAdminProperties();
+    if (confirm("Apakah Anda yakin ingin menghapus unit ini secara permanen?")) {
+        globalProperties = globalProperties.filter(p => p.id !== id);
+        localStorage.setItem('properties', JSON.stringify(globalProperties));
+        loadAdminProperties();
+        alert("Unit kontrakan berhasil dihapus!");
     }
 };
