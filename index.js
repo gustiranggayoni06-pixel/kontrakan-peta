@@ -1,5 +1,5 @@
 // 🔒 NOMOR WHATSAPP PEMILIK (Ganti dengan nomor Pak David, awali dengan kode negara tanpa tanda +)
-const NOMOR_WA_PEMILIK = "6281234567890"; 
+const NOMOR_WA_PEMILIK = "6281381767806"; 
 
 const PERMANENT_LAT = -6.3388566;
 const PERMANENT_LNG = 107.2686087;
