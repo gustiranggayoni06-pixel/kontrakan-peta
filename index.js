@@ -20,7 +20,6 @@ function muatDataKontrakan() {
 }
 
 function renderPetaDanList() {
-    // Jalankan peta Leaflet ke elemen ID 'map' atau 'admin-map' yang tersedia
     const mapElement = document.getElementById('map') || document.getElementById('admin-map');
     if (mapElement && !map) {
         map = L.map(mapElement).setView([PERMANENT_LAT, PERMANENT_LNG], 16);
@@ -30,7 +29,6 @@ function renderPetaDanList() {
         markerGroup.clearLayers();
     }
 
-    // Cari ID kontainer kartu rekomendasi kontrakan Anda
     const containerDaftar = document.getElementById('daftar-kontrakan') || document.getElementById('properties-list') || document.querySelector('.grid');
     if (containerDaftar) {
         containerDaftar.innerHTML = '';
@@ -44,18 +42,39 @@ function renderPetaDanList() {
 
         if (containerDaftar) {
             containerDaftar.innerHTML += `
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between mb-3" style="color: #333;">
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between mb-4" style="color: #333;">
                     <div>
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-gray-800 text-base truncate w-48">${unit.name}</h3>
-                            <span class="px-2 py-0.5 text-[10px] rounded-full font-extrabold ${unit.status === 'Tersedia' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">${unit.status}</span>
+                        <div class="flex justify-between items-start gap-2">
+                            <h3 class="font-bold text-gray-800 text-base leading-tight">${unit.name}</h3>
+                            <span class="px-2.5 py-0.5 text-[10px] rounded-full font-black tracking-wide ${unit.status === 'Tersedia' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${unit.status}</span>
                         </div>
-                        <p class="text-indigo-600 font-extrabold text-sm mt-1">Rp ${Number(unit.price).toLocaleString('id-ID')} / bulan</p>
-                        <p class="text-gray-600 text-xs mt-2 mb-4"><b>Fasilitas:</b> ${unit.desc}</p>
+                        <p class="text-xs text-indigo-500 font-semibold mt-1">Kategori: ${unit.category}</p>
+                        <p class="text-indigo-600 font-black text-base mt-2">Rp ${Number(unit.price).toLocaleString('id-ID')} / bulan</p>
+                        <p class="text-gray-600 text-xs mt-3 mb-4 leading-relaxed"><b>Fasilitas:</b> ${unit.desc}</p>
+                    </div>
+                    <div class="flex gap-2 border-t border-gray-100 pt-3">
+                        <button onclick="map.setView([${PERMANENT_LAT}], [${PERMANENT_LNG}], 17)" class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold py-2 rounded-xl transition-all">
+                            📍 Lihat Peta
+                        </button>
+                        <button onclick="window.pilihUnitBooking('${unit.name}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition-all shadow-sm shadow-indigo-200">
+                            📝 Sewa & Survei
+                        </button>
                     </div>
                 </div>`;
         }
     });
 }
+
+// Fungsi pembantu agar Klik tombol Sewa otomatis memasukkan nama unit ke input form booking Anda
+window.pilihUnitBooking = function(namaUnit) {
+    const inputUnit = document.getElementById('unit-terpilih') || document.querySelector('input[placeholder*="Sewa"]');
+    const formBooking = document.getElementById('form-booking') || document.querySelector('form');
+    if (inputUnit) {
+        inputUnit.value = namaUnit;
+    }
+    if (formBooking) {
+        formBooking.scrollIntoView({ behavior: 'smooth' });
+    }
+};
 
 document.addEventListener('DOMContentLoaded', muatDataKontrakan);
