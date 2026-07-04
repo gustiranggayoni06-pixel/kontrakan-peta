@@ -31,7 +31,7 @@ function loadAdminProperties() {
     if (stored) {
         globalProperties = JSON.parse(stored);
     } else {
-        // Data default awal yang bersih
+        // Data master awal jika database browser kosong
         globalProperties = [
             { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia" },
             { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia" }
@@ -53,8 +53,8 @@ function loadAdminProperties() {
                             <p class="text-xs text-emerald-400 font-bold mt-1">Rp ${Number(p.price).toLocaleString('id-ID')} / bulan</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="window.bukaModeEdit(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-[11px] px-2 py-1 rounded font-bold">🛠️ Edit</button>
-                            <button onclick="window.deleteProperty(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded font-bold">❌ Hapus</button>
+                            <button onclick="window.bukaModeEdit(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-[11px] px-2.5 py-1 rounded font-bold transition-all">🛠️ Edit</button>
+                            <button onclick="window.deleteProperty(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-[11px] px-2.5 py-1 rounded font-bold transition-all">❌ Hapus</button>
                         </div>
                     </div>
 
@@ -64,7 +64,7 @@ function loadAdminProperties() {
                             <input type="text" id="edit-name-${p.id}" value="${p.name}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-slate-400 block mb-0.5">Harga (Angka Saja, misal 600000):</label>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Harga Sewa Bulanan (Ketik Angka Saja):</label>
                             <input type="text" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
                         </div>
                         <div>
@@ -101,6 +101,7 @@ document.getElementById('add-property-form').addEventListener('submit', (e) => {
     const category = document.getElementById('prop-category').value.trim();
     const desc = document.getElementById('prop-desc').value.trim();
 
+    // Proteksi filter agar tidak ada titik/koma yang merusak nominal angka
     const cleanPrice = String(priceInput).replace(/[^0-9]/g, '');
 
     const newUnit = {
@@ -119,7 +120,7 @@ document.getElementById('add-property-form').addEventListener('submit', (e) => {
     alert("Unit baru berhasil di-publish ke website!");
 });
 
-// === 4. LOGIKA TOMBOL FORM EDIT ===
+// === 4. LOGIKA PENGENDALI FORM EDIT ===
 window.bukaModeEdit = function(id) {
     document.getElementById(`edit-form-${id}`).classList.remove('hidden');
 };
@@ -134,6 +135,7 @@ window.simpanHasilEdit = function(id) {
     const kategoriBaru = document.getElementById(`edit-category-${id}`).value.trim();
     const deskripsiBaru = document.getElementById(`edit-desc-${id}`).value.trim();
 
+    // Memastikan input harga dibersihkan dari karakter selain angka murni
     const hargaBersih = String(hargaInput).replace(/[^0-9]/g, '');
 
     globalProperties = globalProperties.map(p => {
