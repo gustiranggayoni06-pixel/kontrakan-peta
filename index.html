@@ -15,7 +15,9 @@
             <h1 class="text-xl font-black text-indigo-600 flex items-center gap-2">
                 <i class="fa-solid fa-location-dot text-red-500"></i> KontrakanMaps
             </h1>
-            <a href="admin.html" class="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">Login Admin</a>
+            <span class="bg-rose-50 text-rose-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                Lokasi Realtime Karawang <i class="fa-solid fa-thumbtack text-rose-400"></i>
+            </span>
         </div>
     </header>
 
@@ -97,8 +99,18 @@
         let properties = JSON.parse(localStorage.getItem('kontrakanData')) || [];
 
         if (properties.length === 0) {
-            listContainer.innerHTML = '<p class="col-span-3 text-center text-slate-500 py-8">Belum ada unit. Tambah dulu di halaman admin.</p>';
-            return;
+            properties = [
+                {
+                    id: 1,
+                    name: "Kamar AC No 05 - Contoh",
+                    price: "650000",
+                    category: "Kamar Mandi Dalam + AC",
+                    desc: "Kasur, Lemari, Listrik Token, WiFi, Parkir Motor",
+                    images: ["https://placehold.co/600x400/4f46e5/white?text=Foto+Kontrakan"],
+                    lat: -6.325,
+                    lng: 107.340
+                }
+            ];
         }
 
         function renderProperties() {
