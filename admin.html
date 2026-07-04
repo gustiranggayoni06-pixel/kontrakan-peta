@@ -17,11 +17,11 @@
         <form id="login-form" class="space-y-4">
             <div>
                 <label class="text-xs text-slate-300 font-semibold block mb-1">Username</label>
-                <input type="text" id="username" required value="admin" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="username" required placeholder="admin" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <div>
                 <label class="text-xs text-slate-300 font-semibold block mb-1">Password</label>
-                <input type="password" id="password" required value="admin123" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="password" id="password" required placeholder="••••••••" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md transition-all">Masuk Dashboard</button>
         </form>
@@ -95,7 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin123') {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        if (user === 'admin' && pass === 'admin123') {
             loginBox.classList.add('hidden');
             dashboard.classList.remove('hidden');
             renderList();
@@ -105,10 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     fileInput.addEventListener('change', async () => {
+        previewContainer.innerHTML = '';
         tempImages = [];
         for (const file of fileInput.files) {
-            if(file.size > 1000000) {
-                alert(`Foto ${file.name} kegedean bang, max 1MB`);
+            if(file.size > 1000000) { // Limit 1MB per foto
+                alert(`Foto ${file.name} kegedean bang, max 1MB. Kompres dulu`);
                 continue;
             }
             const base64 = await toBase64(file);
@@ -160,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderList() {
         listContainer.innerHTML = '';
-        if (properties.length === 0) return listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Belum ada unit.</p>';
+        if (properties.length === 0) return listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Belum ada unit. Tambah dulu bang.</p>';
         
         properties.forEach(prop => {
             const firstImg = prop.images && prop.images.length > 0? prop.images[0] : 'https://placehold.co/80x80/334155/white?text=No+Img';
@@ -199,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onerror = error => reject(error);
         });
     }
+
     renderList();
 });
 </script>
