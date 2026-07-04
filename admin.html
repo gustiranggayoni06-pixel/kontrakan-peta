@@ -46,43 +46,49 @@
                 </h2>
                 <form id="add-property-form" class="space-y-3 text-slate-200">
                     <div>
-                        <label class="text- text-slate-400 block mb-0.5">Nama Kamar / Unit</label>
+                        <label class="text-xs text-slate-400 block mb-0.5">Nama Kamar / Unit</label>
                         <input type="text" id="prop-name" required placeholder="Contoh: Kamar AC No 05" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
                     </div>
                     <div>
-                        <label class="text- text-slate-400 block mb-0.5">Harga Sewa Bulanan</label>
+                        <label class="text-xs text-slate-400 block mb-0.5">Harga Sewa Bulanan</label>
                         <div class="relative">
                             <span class="absolute left-3 top-2 text-xs text-slate-400">Rp</span>
                             <input type="text" id="prop-price" required placeholder="600.000" class="w-full bg-slate-700 border border-slate-600 p-2 pl-8 rounded-lg text-xs text-white focus:outline-none">
                         </div>
-                        <p class="text- text-emerald-400 mt-1" id="price-preview">Rp 0</p>
+                        <p class="text-xs text-emerald-400 mt-1" id="price-preview">Rp 0</p>
                     </div>
                     <div>
-                        <label class="text- text-slate-400 block mb-0.5">Alamat Lengkap</label>
+                        <label class="text-xs text-slate-400 block mb-0.5">Alamat Lengkap</label>
                         <input type="text" id="prop-address" required placeholder="Jl. Tuparev No. 45, Karawang" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
                     </div>
                     <div>
-                        <label class="text- text-slate-400 block mb-0.5">Kategori Fasilitas</label>
+                        <label class="text-xs text-slate-400 block mb-0.5">Kategori Fasilitas</label>
                         <input type="text" id="prop-category" required placeholder="Contoh: Kamar Mandi Dalam / AC" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
                     </div>
                     
                     <div>
-                        <label class="text- text-indigo-300 font-bold block mb-0.5">📸 Upload Foto Kontrakan (Bisa Pilih Banyak):</label>
-                        <input type="file" id="prop-files" multiple accept="image/*" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded-lg text-xs text-white cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text- file:bg-indigo-600 file:text-white">
+                        <label class="text-xs text-indigo-300 font-bold block mb-0.5">📸 Upload Foto Kontrakan:</label>
+                        <input type="file" id="prop-files" multiple accept="image/*" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded-lg text-xs text-white cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-600 file:text-white">
                         <div id="preview-foto" class="flex gap-2 mt-2 flex-wrap"></div>
                     </div>
 
                     <div>
-                        <label class="text- text-slate-400 block mb-0.5">Fasilitas Lengkap / Deskripsi</label>
+                        <label class="text-xs text-slate-400 block mb-0.5">Fasilitas Lengkap / Deskripsi</label>
                         <textarea id="prop-desc" required placeholder="Sebutkan kasur, lemari, listrik token, dll..." class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white h-16 focus:outline-none"></textarea>
                     </div>
 
                     <div>
-                        <label class="text- text-amber-300 font-bold block mb-0.5">📍 Klik di Peta Buat Nentuin Lokasi:</label>
+                        <label class="text-xs text-amber-300 font-bold block mb-0.5">📍 Klik di Peta Buat Nentuin Lokasi:</label>
                         <div id="map-picker" class="w-full h-48 rounded-lg border border-slate-600 z-10"></div>
                         <div class="grid grid-cols-2 gap-2 mt-1">
-                            <input type="text" id="prop-lat" readonly placeholder="Latitude" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded text- text-slate-400">
-                            <input type="text" id="prop-lng" readonly placeholder="Longitude" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded text- text-slate-400">
+                            <div>
+                                <label class="text-xs text-slate-500">Latitude:</label>
+                                <input type="text" id="prop-lat" readonly placeholder="Klik peta" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded text-xs text-emerald-400">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-500">Longitude:</label>
+                                <input type="text" id="prop-lng" readonly placeholder="Klik peta" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded text-xs text-emerald-400">
+                            </div>
                         </div>
                     </div>
 
@@ -94,7 +100,7 @@
                 <h2 class="text-sm font-bold text-white border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Inventori Unit Website Anda
                 </h2>
-                <div id="admin-properties-list" class="max-h-96 overflow-y-auto pr-1 space-y-3"></div>
+                <div id="admin-properties-list" class="max-h-[600px] overflow-y-auto pr-1 space-y-3"></div>
             </div>
         </div>
     </div>
@@ -118,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let tempImages = [];
     let map, marker;
 
-    // Format harga otomatis
     priceInput.addEventListener('input', (e) => {
         let value = e.target.value.replace(/\D/g, '');
         if(value) {
@@ -134,8 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin123') {
             loginBox.classList.add('hidden');
             dashboard.classList.remove('hidden');
-            initMap();
-            renderList();
+            setTimeout(() => {
+                initMap();
+                renderList();
+            }, 100);
         } else {
             alert('Username / Password salah bang!');
         }
@@ -174,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             previewContainer.innerHTML += `
                 <div class="relative">
                     <img src="${img}" class="w-16 h-16 object-cover rounded-lg border border-slate-600">
-                    <button type="button" onclick="hapusFotoPreview(${i})" class="absolute -top-1 -right-1 bg-rose-600 text-white rounded-full w-4 h-4 text- flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                    <button type="button" onclick="hapusFotoPreview(${i})" class="absolute -top-1 -right-1 bg-rose-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
                 </div>`;
         });
     }
@@ -187,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addForm.addEventListener('submit', (e) => {
         e.preventDefault();
         if (tempImages.length === 0) return alert('Upload minimal 1 foto bang');
-        if (!latInput.value || !lngInput.value) return alert('Klik di peta dulu buat nentuin lokasi bang');
+        if (!latInput.value ||!lngInput.value) return alert('Klik di peta dulu buat nentuin lokasi bang');
         
         const priceValue = priceInput.value.replace(/\D/g, '');
         if(!priceValue || priceValue < 100000) return alert('Harga minimal 100.000 bang');
@@ -211,6 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
         previewContainer.innerHTML = ''; 
         tempImages = [];
         pricePreview.textContent = 'Rp 0';
+        latInput.value = '';
+        lngInput.value = '';
         if (marker) map.removeLayer(marker);
         renderList(); 
         alert('Unit berhasil dipublish! Cek index.html');
@@ -234,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button onclick="hapusUnit(${prop.id})" class="text-rose-500 hover:text-rose-400 ml-2 text-xs font-bold px-2 py-1 rounded bg-rose-500/20"><i class="fa-solid fa-trash"></i></button>
                         </div>
                         <p class="text-xs text-emerald-400 font-semibold mt-1">Rp ${Number(prop.price).toLocaleString('id-ID')} / bulan</p>
-                        <p class="text- text-slate-300 mt-1 line-clamp-1">${prop.category}</p>
+                        <p class="text-xs text-amber-400 mt-1">Lat: ${prop.lat}, Lng: ${prop.lng}</p>
                     </div>
                 </div>`;
         });
