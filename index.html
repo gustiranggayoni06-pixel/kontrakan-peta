@@ -22,12 +22,10 @@
     </header>
 
     <main class="max-w-6xl mx-auto p-4 space-y-6">
-        <!-- Section Peta -->
         <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div id="map" class="w-full h-[380px] rounded-xl z-10"></div>
         </div>
 
-        <!-- Section List Unit -->
         <div>
             <h2 class="text-lg font-extrabold text-slate-800 border-l-4 border-indigo-600 pl-2 mb-4">
                 Unit Rekomendasi Kontrakan
@@ -35,23 +33,22 @@
             <div id="properties-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
 
-        <!-- Section Form Booking -->
         <div id="form-booking" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm max-w-lg mx-auto">
             <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                📋 Form Booking & Survei
+                📋 Form Booking & Survei Kontrakan
             </h2>
             <form id="booking-form-wa" class="space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-600 block mb-1">Unit Terpilih</label>
-                    <input type="text" id="unit-terpilih" readonly placeholder="Klik tombol 'Sewa & Survei'" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-sm font-medium text-indigo-600">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Unit Kontrakan Terpilih</label>
+                    <input type="text" id="unit-terpilih" readonly placeholder="Klik tombol 'Sewa' pada unit di atas" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-sm font-medium text-indigo-600 focus:outline-none">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-600 block mb-1">Nama Anda</label>
-                    <input type="text" id="tenant-name" required placeholder="Masukkan nama lengkap" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Nama Lengkap Anda</label>
+                    <input type="text" id="tenant-name" required placeholder="Masukkan nama lengkap Anda" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-600 block mb-1">No. WhatsApp Anda</label>
-                    <input type="tel" id="tenant-phone" required placeholder="Contoh: 08123456xxx" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                    <input type="tel" id="tenant-phone" required placeholder="Contoh: 081234567xxx" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
                     <i class="fa-brands fa-whatsapp text-lg"></i> Kirim via WhatsApp ke Pemilik
@@ -60,23 +57,22 @@
         </div>
     </main>
 
-    <!-- MODAL DETAIL & FOTO -->
     <div id="detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-2xl rounded-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
             <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 sticky top-0 rounded-t-2xl z-10">
                 <h3 id="modal-title" class="font-bold text-slate-800 text-base">Detail Kontrakan</h3>
-                <button onclick="tutupModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="window.tutupModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-5 space-y-4">
                 <div>
-                    <span class="text-xs font-bold text-slate-500 block mb-2">📸 Galeri Foto Unit Hasil Upload:</span>
+                    <span class="text-xs font-bold text-slate-500 block mb-2">📸 Foto Unit Hasil Upload Admin:</span>
                     <div id="modal-gallery" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
                 </div>
                 <div class="space-y-2 border-t border-slate-100 pt-3">
                     <p class="text-xs text-indigo-600 font-bold" id="modal-category"></p>
                     <p class="text-xl font-black text-emerald-600" id="modal-price"></p>
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                        <span class="text-xs font-bold text-slate-700 block mb-1">📋 Fasilitas & Keterangan Lengkap:</span>
+                        <span class="text-xs font-bold text-slate-700 block mb-1">📋 Fasilitas Lengkap:</span>
                         <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line" id="modal-desc"></p>
                     </div>
                 </div>
