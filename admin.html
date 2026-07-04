@@ -3,284 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - KontrakanMaps</title>
+    <title>Master Control Admin - KontrakanMaps</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-     .leaflet-container { z-index: 1!important; }
-    </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
 
     <div id="login-box" class="w-full max-w-sm bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
         <div class="text-center mb-6">
             <i class="fa-solid fa-lock text-3xl text-indigo-400 mb-2"></i>
-            <h1 class="text-xl font-black text-white">Admin Panel</h1>
-            <p class="text-xs text-slate-400 mt-1">KontrakanMaps Dashboard</p>
+            <h1 class="text-xl font-black text-white">Admin Login</h1>
         </div>
         <form id="login-form" class="space-y-4">
             <div>
                 <label class="text-xs text-slate-300 font-semibold block mb-1">Username</label>
-                <input type="text" id="username" required class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="username" required placeholder="admin" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <div>
                 <label class="text-xs text-slate-300 font-semibold block mb-1">Password</label>
-                <input type="password" id="password" required class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="password" id="password" required placeholder="••••••••" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md transition-all">Masuk Dashboard</button>
         </form>
     </div>
 
-    <div id="admin-dashboard" class="w-full max-w-7xl bg-slate-800 rounded-2xl border border-slate-700 p-5 shadow-2xl hidden my-4">
+    <div id="admin-dashboard" class="w-full max-w-4xl bg-slate-800 rounded-2xl border border-slate-700 p-5 shadow-2xl hidden my-4">
         <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-5">
-            <div>
-                <h1 class="text-lg font-black text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-indigo-400"></i> Admin Panel KontrakanMaps
-                </h1>
-                <p class="text-xs text-slate-400">Kelola semua unit kontrakan dari sini</p>
-            </div>
-            <button onclick="location.reload()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
-                Logout <i class="fa-solid fa-right-from-bracket ml-1"></i>
-            </button>
+            <h1 class="text-lg font-black text-white flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-indigo-400"></i> Penguasa Panel Admin
+            </h1>
+            <button onclick="location.reload()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">Logout</button>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-5 gap-5">
-            <div class="xl:col-span-2 bg-slate-700/30 p-4 rounded-xl border border-slate-700/60 h-fit space-y-3">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="md:col-span-1 bg-slate-700/30 p-4 rounded-xl border border-slate-700/60 h-fit space-y-3">
                 <h2 class="text-sm font-bold text-white border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-plus text-emerald-400"></i> Tambah Unit Baru
                 </h2>
                 <form id="add-property-form" class="space-y-3 text-slate-200">
                     <div>
-                        <label class="text-xs text-slate-400 block mb-0.5">Nama Kamar / Unit *</label>
-                        <input type="text" id="prop-name" required placeholder="Contoh: Kamar AC No 05" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Nama Kamar / Unit</label>
+                        <input type="text" id="prop-name" required placeholder="Contoh: Kamar AC No 05" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
                     </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-xs text-slate-400 block mb-0.5">Harga / Bulan *</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2 text-xs text-slate-400">Rp</span>
-                                <input type="text" id="prop-price" required placeholder="600.000" class="w-full bg-slate-700 border border-slate-600 p-2 pl-8 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                            </div>
-                            <p class="text-xs text-emerald-400 mt-1" id="price-preview">Rp 0</p>
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400 block mb-0.5">Kategori *</label>
-                            <input type="text" id="prop-category" required placeholder="AC / KM Dalam" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                        </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Harga Sewa Bulanan (Angka Saja)</label>
+                        <input type="number" id="prop-price" required placeholder="650000" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Kategori Fasilitas</label>
+                        <input type="text" id="prop-category" required placeholder="Contoh: Kamar Mandi Dalam / AC" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="text-[10px] text-indigo-300 font-bold block mb-0.5">📸 Upload Foto Kontrakan (Bisa Pilih Banyak):</label>
+                        <input type="file" id="prop-files" multiple accept="image/*" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded-lg text-xs text-white cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[11px] file:bg-indigo-600 file:text-white">
                     </div>
 
                     <div>
-                        <label class="text-xs text-slate-400 block mb-0.5">Alamat Lengkap *</label>
-                        <input type="text" id="prop-address" required placeholder="Jl. Tuparev No. 45, Karawang" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Fasilitas Lengkap / Deskripsi</label>
+                        <textarea id="prop-desc" required placeholder="Sebutkan kasur, lemari, listrik token, dll..." class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white h-20 focus:outline-none"></textarea>
                     </div>
-
-                    <div>
-                        <label class="text-xs text-indigo-300 font-bold block mb-0.5">📸 Upload Foto (Max 5MB/foto):</label>
-                        <input type="file" id="prop-files" multiple accept="image/*" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded-lg text-xs text-white cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-600 file:text-white">
-                        <div id="preview-foto" class="flex gap-2 mt-2 flex-wrap"></div>
-                    </div>
-
-                    <div>
-                        <label class="text-xs text-slate-400 block mb-0.5">Fasilitas / Deskripsi *</label>
-                        <textarea id="prop-desc" required placeholder="Kasur, lemari, listrik token, WiFi, parkir motor..." class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white h-16 focus:outline-none focus:ring-1 focus:ring-indigo-500"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="text-xs text-amber-300 font-bold block mb-0.5">📍 Klik Peta Untuk Lokasi *</label>
-                        <div id="map-picker" class="w-full h-48 rounded-lg border border-slate-600"></div>
-                        <div class="grid grid-cols-2 gap-2 mt-1">
-                            <div>
-                                <label class="text-xs text-slate-500">Latitude:</label>
-                                <input type="text" id="prop-lat" readonly placeholder="Klik peta" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded text-xs text-emerald-400">
-                            </div>
-                            <div>
-                                <label class="text-xs text-slate-500">Longitude:</label>
-                                <input type="text" id="prop-lng" readonly placeholder="Klik peta" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded text-xs text-emerald-400">
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs transition-all shadow-md">
-                        <i class="fa-solid fa-upload mr-1"></i> Publish Unit Kontrakan
-                    </button>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition-all shadow-md">Publish Unit Kontrakan</button>
                 </form>
             </div>
 
-            <div class="xl:col-span-3 space-y-3">
+            <div class="md:col-span-2 space-y-3">
                 <h2 class="text-sm font-bold text-white border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
-                    <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Total Unit: <span id="total-unit">0</span>
+                    <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Inventori Unit Website Anda
                 </h2>
-                <div id="admin-properties-list" class="max-h-[700px] overflow-y-auto pr-1 space-y-3"></div>
+                <div id="admin-properties-list" class="max-h-[600px] overflow-y-auto pr-1 space-y-3"></div>
             </div>
         </div>
     </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
-    const loginBox = document.getElementById('login-box');
-    const dashboard = document.getElementById('admin-dashboard');
-    const addForm = document.getElementById('add-property-form');
-    const fileInput = document.getElementById('prop-files');
-    const previewContainer = document.getElementById('preview-foto');
-    const listContainer = document.getElementById('admin-properties-list');
-    const priceInput = document.getElementById('prop-price');
-    const pricePreview = document.getElementById('price-preview');
-    const latInput = document.getElementById('prop-lat');
-    const lngInput = document.getElementById('prop-lng');
-    const totalUnit = document.getElementById('total-unit');
-
-    let properties = JSON.parse(localStorage.getItem('kontrakanData')) || [];
-    let tempImages = [];
-    let map, marker;
-
-    priceInput.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if(value) {
-            e.target.value = Number(value).toLocaleString('id-ID');
-            pricePreview.textContent = 'Rp ' + Number(value).toLocaleString('id-ID');
-        } else {
-            pricePreview.textContent = 'Rp 0';
-        }
-    });
-
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin123') {
-            loginBox.classList.add('hidden');
-            dashboard.classList.remove('hidden');
-            setTimeout(() => {
-                initMap();
-                renderList();
-            }, 100);
-        } else {
-            alert('Username / Password salah!');
-        }
-    });
-
-    function initMap() {
-        map = L.map('map-picker').setView([-6.3388122, 107.266105], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        map.on('click', (e) => {
-            const { lat, lng } = e.latlng;
-            latInput.value = lat.toFixed(6);
-            lngInput.value = lng.toFixed(6);
-
-            if (marker) map.removeLayer(marker);
-            marker = L.marker([lat, lng]).addTo(map);
-        });
-    }
-
-    fileInput.addEventListener('change', async () => {
-        tempImages = [];
-        for (const file of fileInput.files) {
-            if(file.size > 5000000) {
-                alert(`Foto ${file.name} kegedean, max 5MB`);
-                continue;
-            }
-            const base64 = await toBase64(file);
-            tempImages.push(base64);
-        }
-        renderPreview();
-    });
-
-    function renderPreview() {
-        previewContainer.innerHTML = '';
-        tempImages.forEach((img, i) => {
-            previewContainer.innerHTML += `
-                <div class="relative">
-                    <img src="${img}" class="w-16 h-16 object-cover rounded-lg border border-slate-600">
-                    <button type="button" onclick="hapusFotoPreview(${i})" class="absolute -top-1 -right-1 bg-rose-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-                </div>`;
-        });
-    }
-
-    window.hapusFotoPreview = (index) => {
-        tempImages.splice(index, 1);
-        renderPreview();
-    }
-
-    addForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (tempImages.length === 0) return alert('Upload minimal 1 foto');
-        if (!latInput.value ||!lngInput.value) return alert('Klik di peta dulu buat nentuin lokasi');
-
-        const priceValue = priceInput.value.replace(/\D/g, '');
-        if(!priceValue || priceValue < 100000) return alert('Harga minimal Rp 100.000');
-
-        const newUnit = {
-            id: Date.now(),
-            name: document.getElementById('prop-name').value,
-            price: priceValue,
-            address: document.getElementById('prop-address').value,
-            category: document.getElementById('prop-category').value,
-            desc: document.getElementById('prop-desc').value,
-            images: tempImages,
-            lat: parseFloat(latInput.value),
-            lng: parseFloat(lngInput.value)
-        };
-
-        properties.unshift(newUnit);
-        localStorage.setItem('kontrakanData', JSON.stringify(properties));
-
-        addForm.reset();
-        previewContainer.innerHTML = '';
-        tempImages = [];
-        pricePreview.textContent = 'Rp 0';
-        latInput.value = '';
-        lngInput.value = '';
-        if (marker) map.removeLayer(marker);
-        renderList();
-        alert('Unit berhasil dipublish!');
-    });
-
-    function renderList() {
-        totalUnit.textContent = properties.length;
-        listContainer.innerHTML = '';
-        if (properties.length === 0) return listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Belum ada unit.</p>';
-
-        properties.forEach(prop => {
-            const firstImg = prop.images && prop.images.length > 0? prop.images[0] : 'https://placehold.co/80x80/334155/white?text=No+Img';
-            listContainer.innerHTML += `
-                <div class="bg-slate-700/50 p-3 rounded-xl border border-slate-700 flex gap-3">
-                    <img src="${firstImg}" class="w-24 h-24 object-cover rounded-lg flex-shrink-0">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-sm font-bold text-white truncate">${prop.name}</h3>
-                                <p class="text-xs text-indigo-400 truncate">${prop.address}</p>
-                            </div>
-                            <button onclick="hapusUnit(${prop.id})" class="text-rose-500 hover:text-rose-400 ml-2 text-xs font-bold px-2 py-1 rounded bg-rose-500/20"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <p class="text-xs text-emerald-400 font-semibold mt-1">Rp ${Number(prop.price).toLocaleString('id-ID')} / bulan</p>
-                        <p class="text-xs text-slate-400 mt-1">${prop.category}</p>
-                        <p class="text-xs text-amber-400 mt-1">📍 ${prop.lat}, ${prop.lng}</p>
-                    </div>
-                </div>`;
-        });
-    }
-
-    window.hapusUnit = (id) => {
-        if (confirm('Yakin mau hapus unit ini?')) {
-            properties = properties.filter(p => p.id!== id);
-            localStorage.setItem('kontrakanData', JSON.stringify(properties));
-            renderList();
-        }
-    };
-
-    function toBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
-});
-</script>
+    <script src="admin.js"></script>
 </body>
 </html>
