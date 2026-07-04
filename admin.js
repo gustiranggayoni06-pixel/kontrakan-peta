@@ -2,14 +2,10 @@ const loginBox = document.getElementById('login-box');
 const adminDashboard = document.getElementById('admin-dashboard');
 let globalProperties = [];
 
-const PERMANENT_LAT = -6.3388566;
-const PERMANENT_LNG = 107.2686087;
-
-// 🔒 AKUN ADMIN UTAMA
+// 🔒 AKUN ADMIN UTAMA LOGIN PANEL
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "admin123";
 
-// === 1. SISTEM LOGIN ===
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const username = document.getElementById('username').value.trim();
@@ -25,13 +21,12 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
     }
 });
 
-// === 2. TAMPILKAN DATA DI PANEL ADMIN ===
+// === FITUR TAMPILKAN DATA (READ) ===
 function loadAdminProperties() {
     const stored = localStorage.getItem('properties');
     if (stored) {
         globalProperties = JSON.parse(stored);
     } else {
-        // Data master awal jika database browser kosong
         globalProperties = [
             { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia" },
             { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia" }
@@ -44,15 +39,15 @@ function loadAdminProperties() {
         container.innerHTML = '';
         globalProperties.forEach(p => {
             container.innerHTML += `
-                <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600 flex flex-col gap-3 mb-3">
-                    <div class="flex justify-between items-start">
+                <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600 flex flex-col gap-3 mb-3 text-left">
+                    <div class="flex justify-between items-start gap-4">
                         <div>
                             <h3 class="font-bold text-sm text-white">${p.name}</h3>
                             <p class="text-[11px] text-indigo-300">Kategori: ${p.category}</p>
                             <p class="text-[11px] text-slate-300 mt-1">Fasilitas: ${p.desc}</p>
                             <p class="text-xs text-emerald-400 font-bold mt-1">Rp ${Number(p.price).toLocaleString('id-ID')} / bulan</p>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-1.5">
                             <button onclick="window.bukaModeEdit(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-[11px] px-2.5 py-1 rounded font-bold transition-all">🛠️ Edit</button>
                             <button onclick="window.deleteProperty(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-[11px] px-2.5 py-1 rounded font-bold transition-all">❌ Hapus</button>
                         </div>
@@ -64,7 +59,7 @@ function loadAdminProperties() {
                             <input type="text" id="edit-name-${p.id}" value="${p.name}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-slate-400 block mb-0.5">Harga Sewa Bulanan (Ketik Angka Saja):</label>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Harga Sewa Bulanan (Angka Saja):</label>
                             <input type="text" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
                         </div>
                         <div>
@@ -93,7 +88,7 @@ function loadAdminProperties() {
     }
 }
 
-// === 3. FITUR TAMBAH UNIT BARU ===
+// === FITUR TAMBAH UNIT BARU ===
 document.getElementById('add-property-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('prop-name').value.trim();
@@ -101,7 +96,6 @@ document.getElementById('add-property-form').addEventListener('submit', (e) => {
     const category = document.getElementById('prop-category').value.trim();
     const desc = document.getElementById('prop-desc').value.trim();
 
-    // Proteksi filter agar tidak ada titik/koma yang merusak nominal angka
     const cleanPrice = String(priceInput).replace(/[^0-9]/g, '');
 
     const newUnit = {
@@ -120,7 +114,7 @@ document.getElementById('add-property-form').addEventListener('submit', (e) => {
     alert("Unit baru berhasil di-publish ke website!");
 });
 
-// === 4. LOGIKA PENGENDALI FORM EDIT ===
+// === LOGIKA PENGENDALI FORM EDIT ===
 window.bukaModeEdit = function(id) {
     document.getElementById(`edit-form-${id}`).classList.remove('hidden');
 };
@@ -135,18 +129,11 @@ window.simpanHasilEdit = function(id) {
     const kategoriBaru = document.getElementById(`edit-category-${id}`).value.trim();
     const deskripsiBaru = document.getElementById(`edit-desc-${id}`).value.trim();
 
-    // Memastikan input harga dibersihkan dari karakter selain angka murni
     const hargaBersih = String(hargaInput).replace(/[^0-9]/g, '');
 
     globalProperties = globalProperties.map(p => {
         if (p.id === id) {
-            return {
-                ...p,
-                name: namaBaru,
-                price: parseInt(hargaBersih) || 0,
-                category: kategoriBaru,
-                desc: deskripsiBaru
-            };
+            return { ...p, name: namaBaru, price: parseInt(hargaBersih) || 0, category: kategoriBaru, desc: deskripsiBaru };
         }
         return p;
     });
@@ -156,14 +143,14 @@ window.simpanHasilEdit = function(id) {
     loadAdminProperties();
 };
 
-// === 5. UPDATE STATUS CEPAT ===
+// === UPDATE STATUS CEPAT ===
 window.updatePropertyStatus = function(id, newStatus) {
     globalProperties = globalProperties.map(p => p.id === id ? { ...p, status: newStatus } : p);
     localStorage.setItem('properties', JSON.stringify(globalProperties));
     alert(`Status kamar berhasil diubah!`);
 };
 
-// === 6. HAPUS DATA UNIT ===
+// === HAPUS DATA UNIT ===
 window.deleteProperty = function(id) {
     if (confirm("Apakah Anda yakin ingin menghapus unit ini secara permanen dari website?")) {
         globalProperties = globalProperties.filter(p => p.id !== id);
