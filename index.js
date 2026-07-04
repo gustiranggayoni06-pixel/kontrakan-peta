@@ -13,7 +13,6 @@ function muatDataKontrakan() {
     if (stored) {
         dataKontrakan = JSON.parse(stored);
     } else {
-        // Template data awal default jikalau kosong
         dataKontrakan = [
             { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia", images: [] },
             { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia", images: [] }
@@ -44,7 +43,6 @@ function renderPetaDanList() {
              .bindPopup(`<b style="color:#4f46e5;">${unit.name}</b><br><b>Rp ${Number(unit.price).toLocaleString('id-ID')}/bln</b>`);
         }
 
-        // Pakai foto pertama indeks [0] dari hasil upload file admin, jika kosong pakai default_img
         const coverImg = (unit.images && unit.images.length > 0) ? unit.images[0] : DEFAULT_IMG;
 
         if (containerDaftar) {
