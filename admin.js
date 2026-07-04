@@ -53,6 +53,7 @@ function loadAdminProperties() {
                         </div>
                     </div>
 
+                    <!-- 🛠️ FORM EDIT TOTAL DATA (MUNCUL DI BAWAH KARTU SAAT DIKLIK) -->
                     <div id="edit-form-${p.id}" class="hidden bg-slate-800 p-3 rounded-lg border border-slate-500 space-y-2 mt-2">
                         <div>
                             <label class="text-[10px] text-slate-400 block mb-0.5">Nama Kamar / Unit:</label>
