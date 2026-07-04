@@ -9,6 +9,7 @@ const PERMANENT_LNG = 107.2686087;
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "admin123";
 
+// === 1. SISTEM LOGIN ===
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const username = document.getElementById('username').value.trim();
@@ -24,12 +25,13 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
     }
 });
 
-// === FITUR TAMPILKAN DATA (READ) ===
+// === 2. TAMPILKAN DATA DI PANEL ADMIN ===
 function loadAdminProperties() {
     const stored = localStorage.getItem('properties');
     if (stored) {
         globalProperties = JSON.parse(stored);
     } else {
+        // Data default awal yang bersih
         globalProperties = [
             { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia" },
             { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia" }
@@ -42,40 +44,46 @@ function loadAdminProperties() {
         container.innerHTML = '';
         globalProperties.forEach(p => {
             container.innerHTML += `
-                <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600 flex flex-col justify-between gap-3">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <h3 id="display-name-${p.id}" class="font-bold text-sm text-white truncate w-40">${p.name}</h3>
-                            <div class="flex gap-2">
-                                <button onclick="window.bukaModeEdit(${p.id})" class="text-amber-400 text-xs hover:text-amber-300 font-bold">🛠️ Edit</button>
-                                <button onclick="window.deleteProperty(${p.id})" class="text-red-400 text-xs hover:text-red-300 font-bold">❌ Hapus</button>
-                            </div>
+                <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600 flex flex-col gap-3 mb-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-sm text-white">${p.name}</h3>
+                            <p class="text-[11px] text-indigo-300">Kategori: ${p.category}</p>
+                            <p class="text-[11px] text-slate-300 mt-1">Fasilitas: ${p.desc}</p>
+                            <p class="text-xs text-emerald-400 font-bold mt-1">Rp ${Number(p.price).toLocaleString('id-ID')} / bulan</p>
                         </div>
-                        <p id="display-category-${p.id}" class="text-[11px] text-indigo-300 mt-0.5">Kategori: ${p.category}</p>
-                        <p id="display-desc-${p.id}" class="text-[11px] text-slate-300 mt-1 line-clamp-2">${p.desc}</p>
-                        
-                        <div id="edit-form-${p.id}" class="hidden mt-3 bg-slate-800 p-3 rounded-lg border border-slate-500 space-y-2">
-                            <label class="text-[10px] text-slate-400 block">Nama Unit:</label>
-                            <input type="text" id="edit-name-${p.id}" value="${p.name}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500">
-                            
-                            <label class="text-[10px] text-slate-400 block">Harga Sewa (Ketik Angka Saja, misal: 600000):</label>
-                            <input type="text" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500">
-                            
-                            <label class="text-[10px] text-slate-400 block">Kategori:</label>
-                            <input type="text" id="edit-category-${p.id}" value="${p.category}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500">
-                            
-                            <label class="text-[10px] text-slate-400 block">Fasilitas / Deskripsi:</label>
-                            <textarea id="edit-desc-${p.id}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500 h-14">${p.desc}</textarea>
-                            
-                            <div class="flex gap-1.5 justify-end pt-1">
-                                <button onclick="window.batalEdit(${p.id})" class="bg-slate-600 text-white text-[10px] px-2 py-1 rounded">Batal</button>
-                                <button onclick="window.simpanHasilEdit(${p.id})" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded font-bold">Simpan</button>
-                            </div>
+                        <div class="flex gap-2">
+                            <button onclick="window.bukaModeEdit(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-[11px] px-2 py-1 rounded font-bold">🛠️ Edit</button>
+                            <button onclick="window.deleteProperty(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded font-bold">❌ Hapus</button>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-600/50">
-                        <span id="display-price-${p.id}" class="text-xs text-emerald-400 font-bold">Rp ${Number(p.price).toLocaleString('id-ID')}</span>
-                        <select onchange="window.updatePropertyStatus(${p.id}, this.value)" class="bg-slate-600 text-white text-xs rounded px-2 py-1 focus:outline-none">
+
+                    <div id="edit-form-${p.id}" class="hidden bg-slate-800 p-3 rounded-lg border border-slate-500 space-y-2 mt-2">
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Nama Kamar / Unit:</label>
+                            <input type="text" id="edit-name-${p.id}" value="${p.name}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Harga (Angka Saja, misal 600000):</label>
+                            <input type="text" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Kategori:</label>
+                            <input type="text" id="edit-category-${p.id}" value="${p.category}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">Fasilitas / Deskripsi:</label>
+                            <textarea id="edit-desc-${p.id}" class="w-full bg-slate-700 text-white text-xs p-2 rounded border border-slate-500 h-16 focus:outline-none">${p.desc}</textarea>
+                        </div>
+                        <div class="flex gap-2 justify-end pt-1">
+                            <button onclick="window.batalEdit(${p.id})" class="bg-slate-600 text-white text-xs px-3 py-1 rounded shadow">Batal</button>
+                            <button onclick="window.simpanHasilEdit(${p.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1 rounded font-bold shadow">💾 Simpan Perubahan</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-600/50 mt-1">
+                        <span class="text-[11px] text-slate-400">Status Kamar Saat Ini:</span>
+                        <select onchange="window.updatePropertyStatus(${p.id}, this.value)" class="bg-slate-600 text-white text-xs rounded px-2 py-1 focus:outline-none border border-slate-500">
                             <option value="Tersedia" ${p.status === 'Tersedia' ? 'selected' : ''}>Tersedia</option>
                             <option value="Penuh" ${p.status === 'Penuh' ? 'selected' : ''}>Penuh</option>
                         </select>
@@ -85,16 +93,15 @@ function loadAdminProperties() {
     }
 }
 
-// === FITUR TAMBAH DATA (CREATE) ===
+// === 3. FITUR TAMBAH UNIT BARU ===
 document.getElementById('add-property-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = document.getElementById('prop-name').value;
+    const name = document.getElementById('prop-name').value.trim();
     const priceInput = document.getElementById('prop-price').value;
-    const category = document.getElementById('prop-category').value;
-    const desc = document.getElementById('prop-desc').value;
+    const category = document.getElementById('prop-category').value.trim();
+    const desc = document.getElementById('prop-desc').value.trim();
 
-    // Bersihkan titik/koma jika user tidak sengaja mengetik format ribuan
-    const cleanPrice = priceInput.replace(/[^0-9]/g, '');
+    const cleanPrice = String(priceInput).replace(/[^0-9]/g, '');
 
     const newUnit = {
         id: Date.now(),
@@ -109,10 +116,10 @@ document.getElementById('add-property-form').addEventListener('submit', (e) => {
     localStorage.setItem('properties', JSON.stringify(globalProperties));
     document.getElementById('add-property-form').reset();
     loadAdminProperties();
-    alert("Unit baru berhasil dipublish!");
+    alert("Unit baru berhasil di-publish ke website!");
 });
 
-// === FITUR EDIT TOTAL ===
+// === 4. LOGIKA TOMBOL FORM EDIT ===
 window.bukaModeEdit = function(id) {
     document.getElementById(`edit-form-${id}`).classList.remove('hidden');
 };
@@ -122,12 +129,11 @@ window.batalEdit = function(id) {
 };
 
 window.simpanHasilEdit = function(id) {
-    const namaBaru = document.getElementById(`edit-name-${id}`).value;
+    const namaBaru = document.getElementById(`edit-name-${id}`).value.trim();
     const hargaInput = document.getElementById(`edit-price-${id}`).value;
-    const kategoriBaru = document.getElementById(`edit-category-${id}`).value;
-    const deskripsiBaru = document.getElementById(`edit-desc-${id}`).value;
+    const kategoriBaru = document.getElementById(`edit-category-${id}`).value.trim();
+    const deskripsiBaru = document.getElementById(`edit-desc-${id}`).value.trim();
 
-    // Bersihkan titik/koma dari input harga agar tidak terpotong menjadi perak
     const hargaBersih = String(hargaInput).replace(/[^0-9]/g, '');
 
     globalProperties = globalProperties.map(p => {
@@ -144,23 +150,23 @@ window.simpanHasilEdit = function(id) {
     });
 
     localStorage.setItem('properties', JSON.stringify(globalProperties));
-    alert("Perubahan unit sukses disimpan!");
+    alert("Sukses! Data unit berhasil diperbarui secara permanen.");
     loadAdminProperties();
 };
 
-// === FITUR UPDATE STATUS CEPAT ===
+// === 5. UPDATE STATUS CEPAT ===
 window.updatePropertyStatus = function(id, newStatus) {
     globalProperties = globalProperties.map(p => p.id === id ? { ...p, status: newStatus } : p);
     localStorage.setItem('properties', JSON.stringify(globalProperties));
-    alert(`Status kamar berhasil diperbarui!`);
+    alert(`Status kamar berhasil diubah!`);
 };
 
-// === FITUR HAPUS DATA ===
+// === 6. HAPUS DATA UNIT ===
 window.deleteProperty = function(id) {
-    if (confirm("Hapus unit ini dari website secara permanen?")) {
+    if (confirm("Apakah Anda yakin ingin menghapus unit ini secara permanen dari website?")) {
         globalProperties = globalProperties.filter(p => p.id !== id);
         localStorage.setItem('properties', JSON.stringify(globalProperties));
         loadAdminProperties();
-        alert("Unit berhasil dihapus!");
+        alert("Unit kontrakan berhasil dihapus!");
     }
 };
