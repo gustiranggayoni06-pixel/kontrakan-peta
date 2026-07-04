@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let properties = JSON.parse(localStorage.getItem('kontrakanData')) || [];
     let tempImages = [];
 
-    // LOGIN - GANTI USERNAME & PASSWORD DI SINI
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const user = document.getElementById('username').value;
@@ -107,27 +106,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // PREVIEW FOTO
     fileInput.addEventListener('change', async () => {
         previewContainer.innerHTML = '';
         tempImages = [];
         for (const file of fileInput.files) {
+            if(file.size > 1000000) { // Limit 1MB per foto
+                alert(`Foto ${file.name} kegedean bang, max 1MB. Kompres dulu`);
+                continue;
+            }
             const base64 = await toBase64(file);
             tempImages.push(base64);
-            previewContainer.innerHTML += `<img src="${base64}" class="w-16 h-16 object-cover rounded-lg border border-slate-600"><button type="button" onclick="hapusFotoPreview(${tempImages.length-1})" class="text-rose-500 text-xs -ml-2 -mt-1"><i class="fa-solid fa-circle-xmark"></i></button>`;
         }
+        renderPreview();
     });
 
-    window.hapusFotoPreview = (index) => {
-        tempImages.splice(index, 1);
-        // Refresh preview
+    function renderPreview() {
         previewContainer.innerHTML = '';
         tempImages.forEach((img, i) => {
-            previewContainer.innerHTML += `<img src="${img}" class="w-16 h-16 object-cover rounded-lg border border-slate-600"><button type="button" onclick="hapusFotoPreview(${i})" class="text-rose-500 text-xs -ml-2 -mt-1"><i class="fa-solid fa-circle-xmark"></i></button>`;
+            previewContainer.innerHTML += `
+                <div class="relative">
+                    <img src="${img}" class="w-16 h-16 object-cover rounded-lg border border-slate-600">
+                    <button type="button" onclick="hapusFotoPreview(${i})" class="absolute -top-1 -right-1 bg-rose-600 text-white rounded-full w-4 h-4 text- flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                </div>`;
         });
     }
 
-    // SUBMIT TAMBAH UNIT
+    window.hapusFotoPreview = (index) => {
+        tempImages.splice(index, 1);
+        renderPreview();
+    }
+
     addForm.addEventListener('submit', (e) => {
         e.preventDefault();
         if (tempImages.length === 0) return alert('Upload minimal 1 foto bang');
@@ -139,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             category: document.getElementById('prop-category').value,
             desc: document.getElementById('prop-desc').value,
             images: tempImages,
-            lat: -6.3227 + (Math.random()-0.5)*0.02, // Random lokasi Karawang
+            lat: -6.3227 + (Math.random()-0.5)*0.02,
             lng: 107.3376 + (Math.random()-0.5)*0.02
         };
 
@@ -153,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Unit berhasil dipublish! Cek index.html');
     });
 
-    // RENDER LIST
     function renderList() {
         listContainer.innerHTML = '';
         if (properties.length === 0) return listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Belum ada unit. Tambah dulu bang.</p>';
