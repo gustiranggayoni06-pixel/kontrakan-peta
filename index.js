@@ -1,4 +1,4 @@
-// 🔒 NOMOR WHATSAPP PEMILIK (Ganti dengan nomor Pak David, awali dengan kode negara tanpa tanda +)
+// 🔒 NOMOR WHATSAPP PEMILIK (Sudah diperbarui ke nomor Pak David)
 const NOMOR_WA_PEMILIK = "6281381767806"; 
 
 const PERMANENT_LAT = -6.3388566;
@@ -8,13 +8,13 @@ let map;
 let markerGroup;
 let dataKontrakan = [];
 
-// Membaca database dinamis
+// Membaca database dinamis dari localStorage
 function muatDataKontrakan() {
     const stored = localStorage.getItem('properties');
     if (stored) {
         dataKontrakan = JSON.parse(stored);
     } else {
-        // Master default awal jika browser belum punya data
+        // Master data default awal jika database browser masih kosong
         dataKontrakan = [
             { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia" },
             { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia" }
@@ -84,7 +84,7 @@ window.pilihUnitBooking = function(namaUnit) {
     if (formBooking) formBooking.scrollIntoView({ behavior: 'smooth' });
 };
 
-// === SISTEM DIRECT KE WHATSAPP ===
+// === SISTEM AUTOMATISASI REDIRECT KE WHATSAPP ===
 document.getElementById('booking-form-wa').addEventListener('submit', function(e) {
     e.preventDefault();
     const unit = document.getElementById('unit-terpilih').value;
@@ -96,14 +96,12 @@ document.getElementById('booking-form-wa').addEventListener('submit', function(e
         return;
     }
 
-    // Merangkai teks template WhatsApp agar rapi saat diterima pemilik
     const teksWA = `Halo Pak David, saya ingin mengajukan sewa/survei kontrakan.%0A%0A` +
                    `▪️ *Unit Terpilih :* ${unit}%0A` +
                    `▪️ *Nama Penyewa :* ${nama}%0A` +
                    `▪️ *No. WhatsApp :* ${hp}%0A%0A` +
                    `Apakah unit tersebut masih tersedia dan kapan saya bisa datang untuk survei lokasi? Terima kasih.`;
 
-    // Redirect otomatis membuka aplikasi WhatsApp browser/HP
     window.open(`https://api.whatsapp.com/send?phone=${NOMOR_WA_PEMILIK}&text=${teksWA}`, '_blank');
 });
 
