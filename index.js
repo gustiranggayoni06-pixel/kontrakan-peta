@@ -1,96 +1,103 @@
-// 🔒 KOORDINAT UTAMA KOSAN PAK DAVID KARAWANG
+const loginBox = document.getElementById('login-box');
+const adminDashboard = document.getElementById('admin-dashboard');
+let globalProperties = [];
+
 const PERMANENT_LAT = -6.3388566;
 const PERMANENT_LNG = 107.2686087;
 
-let map;
-let markerGroup;
-let dataKontrakan = [];
+// 🔒 AKUN ADMIN UTAMA
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "admin123";
 
-// Fungsi memuat data secara dinamis dari kendali admin (localStorage)
-function muatDataKontrakan() {
+document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        alert('Login Berhasil! Akses Penguasa Diaktifkan.');
+        loginBox.classList.add('hidden');
+        adminDashboard.classList.remove('hidden');
+        loadAdminProperties();
+    } else { 
+        alert("Username atau Password salah!"); 
+    }
+});
+
+function loadAdminProperties() {
     const stored = localStorage.getItem('properties');
     if (stored) {
-        dataKontrakan = JSON.parse(stored);
+        globalProperties = JSON.parse(stored);
     } else {
-        // Otomatis membuat data default jika database browser masih kosong melompong
-        dataKontrakan = [
-            {
-                id: 1,
-                name: "Kosan Pak David - Kamar Standard",
-                price: 550000,
-                category: "Kamar Mandi Dalam",
-                desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi",
-                status: "Tersedia"
-            },
-            {
-                id: 2,
-                name: "Kosan Pak David - Kamar Ber-AC",
-                price: 600000,
-                category: "Fasilitas AC",
-                desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi",
-                status: "Tersedia"
-            }
+        globalProperties = [
+            { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia" },
+            { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia" }
         ];
-        localStorage.setItem('properties', JSON.stringify(dataKontrakan));
+        localStorage.setItem('properties', JSON.stringify(globalProperties));
     }
 
-    renderPetaDanList();
-}
-
-function renderPetaDanList() {
-    // 1. Inisialisasi Peta Leaflet jika belum ada
-    if (!map) {
-        map = L.map('map').setView([PERMANENT_LAT, PERMANENT_LNG], 16);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-        markerGroup = L.layerGroup().addTo(map);
-    } else {
-        markerGroup.clearLayers();
-    }
-
-    // 2. Tampilkan ke List Kartu & Pin Peta
-    const containerDaftar = document.getElementById('daftar-kontrakan') || document.getElementById('properties-list');
-    if (containerDaftar) {
-        containerDaftar.innerHTML = '';
-    }
-
-    dataKontrakan.forEach(unit => {
-        // Tancapkan Pin ke Peta
-        const marker = L.marker([PERMANENT_LAT, PERMANENT_LNG]).addTo(markerGroup);
-        marker.bindPopup(`
-            <div class="p-1">
-                <h3 class="font-bold text-indigo-600 text-sm">${unit.name}</h3>
-                <p class="text-xs font-bold text-green-600 mt-0.5">Rp ${Number(unit.price).toLocaleString('id-ID')} / bulan</p>
-                <p class="text-[11px] text-gray-500 my-1">${unit.desc}</p>
-                <span class="px-1.5 py-0.5 text-[10px] rounded font-bold ${unit.status === 'Tersedia' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${unit.status}</span>
-            </div>
-        `);
-
-        // Tampilkan Kartu Informasi di bawah peta
-        if (containerDaftar) {
-            containerDaftar.innerHTML += `
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+    const container = document.getElementById('admin-properties-list');
+    if(container) {
+        container.innerHTML = '';
+        globalProperties.forEach(p => {
+            container.innerHTML += `
+                <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600 flex flex-col justify-between gap-3">
                     <div>
                         <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-gray-800 text-base leading-snug truncate w-48">${unit.name}</h3>
-                            <span class="px-2 py-0.5 text-[10px] rounded-full font-extrabold ${unit.status === 'Tersedia' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">${unit.status}</span>
+                            <h3 class="font-bold text-sm text-white truncate w-40">${p.name}</h3>
+                            <button onclick="window.deleteProperty(${p.id})" class="text-red-400 text-xs hover:text-red-300 font-bold">Hapus</button>
                         </div>
-                        <p class="text-indigo-600 font-extrabold text-sm mt-1">Rp ${Number(unit.price).toLocaleString('id-ID')} / bulan</p>
-                        <p class="text-gray-600 text-xs mt-2 mb-4 leading-relaxed">✨ <b>Fasilitas:</b> ${unit.desc}</p>
+                        <p class="text-[11px] text-slate-300 mt-1 line-clamp-2">${p.desc}</p>
                     </div>
-                    <div class="flex gap-2 mt-auto">
-                        <button onclick="map.setView([${PERMANENT_LAT}], [${PERMANENT_LNG}], 17)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold py-2 rounded-lg transition-colors">
-                            Lihat Peta
-                        </button>
-                        <button onclick="document.getElementById('unit-terpilih').value='${unit.name}'; document.getElementById('form-booking').scrollIntoView({behavior:'smooth'})" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 rounded-lg transition-colors">
-                            Sewa & Survei
-                        </button>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-600/50">
+                        <span class="text-xs text-emerald-400 font-bold">Rp ${Number(p.price).toLocaleString('id-ID')}</span>
+                        <select onchange="window.updatePropertyStatus(${p.id}, this.value)" class="bg-slate-600 text-white text-xs rounded px-2 py-1 focus:outline-none">
+                            <option value="Tersedia" ${p.status === 'Tersedia' ? 'selected' : ''}>Tersedia</option>
+                            <option value="Penuh" ${p.status === 'Penuh' ? 'selected' : ''}>Penuh</option>
+                        </select>
                     </div>
                 </div>`;
-        }
-    });
+        });
+    }
 }
 
-// Jalankan otomatis saat halaman terbuka
-document.addEventListener('DOMContentLoaded', muatDataKontrakan);
+// ➕ TAMBAH DATA BARU
+document.getElementById('add-property-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('prop-name').value;
+    const price = document.getElementById('prop-price').value;
+    const category = document.getElementById('prop-category').value;
+    const desc = document.getElementById('prop-desc').value;
+
+    const newUnit = {
+        id: Date.now(),
+        name,
+        price: parseInt(price) || 0,
+        category,
+        desc,
+        status: "Tersedia"
+    };
+
+    globalProperties.push(newUnit);
+    localStorage.setItem('properties', JSON.stringify(globalProperties));
+    document.getElementById('add-property-form').reset();
+    loadAdminProperties();
+    alert("Unit baru berhasil dipublish!");
+});
+
+// 🔄 EDIT / UPDATE STATUS
+window.updatePropertyStatus = function(id, newStatus) {
+    globalProperties = globalProperties.map(p => p.id === id ? { ...p, status: newStatus } : p);
+    localStorage.setItem('properties', JSON.stringify(globalProperties));
+    alert(`Status kamar berhasil diperbarui!`);
+};
+
+// ❌ HAPUS DATA
+window.deleteProperty = function(id) {
+    if (confirm("Hapus unit ini dari website secara permanen?")) {
+        globalProperties = globalProperties.filter(p => p.id !== id);
+        localStorage.setItem('properties', JSON.stringify(globalProperties));
+        loadAdminProperties();
+        alert("Unit berhasil dihapus!");
+    }
+};
