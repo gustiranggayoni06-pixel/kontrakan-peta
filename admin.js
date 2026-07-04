@@ -19,7 +19,6 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
     }
 });
 
-// Mengubah file lokal komputer/HP menjadi data teks string (Base64) agar bisa disimpan di memori
 function convertFileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -71,7 +70,7 @@ function loadAdminProperties() {
                             <input type="text" id="edit-category-${p.id}" value="${p.category}" class="w-full bg-slate-700 text-xs p-2 rounded text-white border border-slate-600 focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-amber-400 font-bold block mb-0.5">📤 Re-upload File Foto Baru (Kosongkan jika foto lama tidak mau diganti):</label>
+                            <label class="text-[10px] text-amber-400 font-bold block mb-0.5">📤 Re-upload File Foto Baru (Kosongkan jika tidak diganti):</label>
                             <input type="file" id="edit-files-${p.id}" multiple accept="image/*" class="w-full bg-slate-700 text-xs p-1.5 rounded text-white border border-slate-600 focus:outline-none">
                         </div>
                         <div>
@@ -96,7 +95,6 @@ function loadAdminProperties() {
     }
 }
 
-// Handler Submit Tambah Unit Baru (Dengan Detektor Upload File)
 document.getElementById('add-property-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('prop-name').value.trim();
@@ -125,7 +123,6 @@ document.getElementById('add-property-form').addEventListener('submit', async (e
 window.bukaModeEdit = id => document.getElementById(`edit-form-${id}`).classList.remove('hidden');
 window.batalEdit = id => document.getElementById(`edit-form-${id}`).classList.add('hidden');
 
-// Handler Menyimpan Hasil Edit (Bisa Ganti Keterangan Data Sekaligus File Gambar)
 window.simpanHasilEdit = async function(id) {
     const namaBaru = document.getElementById(`edit-name-${id}`).value.trim();
     const hargaBaru = parseInt(document.getElementById(`edit-price-${id}`).value) || 0;
@@ -136,8 +133,6 @@ window.simpanHasilEdit = async function(id) {
     let updatedPropertiesPromises = globalProperties.map(async (p) => {
         if (p.id === id) {
             let updatedImages = p.images || [];
-            
-            // Jika admin memilih/mengupload file gambar baru, timpa foto lama
             if (fileInputEdit && fileInputEdit.files.length > 0) {
                 updatedImages = [];
                 for (let i = 0; i < fileInputEdit.files.length; i++) {
@@ -159,14 +154,12 @@ window.simpanHasilEdit = async function(id) {
 window.updatePropertyStatus = function(id, newStatus) {
     globalProperties = globalProperties.map(p => p.id === id ? { ...p, status: newStatus } : p);
     localStorage.setItem('properties', JSON.stringify(globalProperties));
-    alert("Status unit berhasil diupdate!");
 };
 
 window.deleteProperty = function(id) {
-    if (confirm("Apakah Anda yakin ingin menghapus unit ini secara permanen dari website?")) {
+    if (confirm("Apakah Anda yakin ingin menghapus unit ini?")) {
         globalProperties = globalProperties.filter(p => p.id !== id);
         localStorage.setItem('properties', JSON.stringify(globalProperties));
         loadAdminProperties();
-        alert("Unit berhasil dihapus!");
     }
 };
