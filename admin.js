@@ -55,11 +55,19 @@ function loadAdminProperties() {
                         <p id="display-desc-${p.id}" class="text-[11px] text-slate-300 mt-1 line-clamp-2">${p.desc}</p>
                         
                         <div id="edit-form-${p.id}" class="hidden mt-3 bg-slate-800 p-3 rounded-lg border border-slate-500 space-y-2">
+                            <label class="text-[10px] text-slate-400 block">Nama Unit:</label>
                             <input type="text" id="edit-name-${p.id}" value="${p.name}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500">
-                            <input type="number" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500">
+                            
+                            <label class="text-[10px] text-slate-400 block">Harga Sewa (Ketik Angka Saja, misal: 600000):</label>
+                            <input type="text" id="edit-price-${p.id}" value="${p.price}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500">
+                            
+                            <label class="text-[10px] text-slate-400 block">Kategori:</label>
                             <input type="text" id="edit-category-${p.id}" value="${p.category}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500">
+                            
+                            <label class="text-[10px] text-slate-400 block">Fasilitas / Deskripsi:</label>
                             <textarea id="edit-desc-${p.id}" class="w-full bg-slate-700 text-white text-xs p-1.5 rounded border border-slate-500 h-14">${p.desc}</textarea>
-                            <div class="flex gap-1.5 justify-end">
+                            
+                            <div class="flex gap-1.5 justify-end pt-1">
                                 <button onclick="window.batalEdit(${p.id})" class="bg-slate-600 text-white text-[10px] px-2 py-1 rounded">Batal</button>
                                 <button onclick="window.simpanHasilEdit(${p.id})" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded font-bold">Simpan</button>
                             </div>
@@ -81,14 +89,17 @@ function loadAdminProperties() {
 document.getElementById('add-property-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('prop-name').value;
-    const price = document.getElementById('prop-price').value;
+    const priceInput = document.getElementById('prop-price').value;
     const category = document.getElementById('prop-category').value;
     const desc = document.getElementById('prop-desc').value;
+
+    // Bersihkan titik/koma jika user tidak sengaja mengetik format ribuan
+    const cleanPrice = priceInput.replace(/[^0-9]/g, '');
 
     const newUnit = {
         id: Date.now(),
         name,
-        price: parseInt(price) || 0,
+        price: parseInt(cleanPrice) || 0,
         category,
         desc,
         status: "Tersedia"
@@ -101,7 +112,7 @@ document.getElementById('add-property-form').addEventListener('submit', (e) => {
     alert("Unit baru berhasil dipublish!");
 });
 
-// === 🛠️ FITUR EDIT TOTAL (UPDATE NAMA, HARGA, DLL) ===
+// === FITUR EDIT TOTAL ===
 window.bukaModeEdit = function(id) {
     document.getElementById(`edit-form-${id}`).classList.remove('hidden');
 };
@@ -112,16 +123,19 @@ window.batalEdit = function(id) {
 
 window.simpanHasilEdit = function(id) {
     const namaBaru = document.getElementById(`edit-name-${id}`).value;
-    const hargaBaru = document.getElementById(`edit-price-${id}`).value;
+    const hargaInput = document.getElementById(`edit-price-${id}`).value;
     const kategoriBaru = document.getElementById(`edit-category-${id}`).value;
     const deskripsiBaru = document.getElementById(`edit-desc-${id}`).value;
+
+    // Bersihkan titik/koma dari input harga agar tidak terpotong menjadi perak
+    const hargaBersih = String(hargaInput).replace(/[^0-9]/g, '');
 
     globalProperties = globalProperties.map(p => {
         if (p.id === id) {
             return {
                 ...p,
                 name: namaBaru,
-                price: parseInt(hargaBaru) || 0,
+                price: parseInt(hargaBersih) || 0,
                 category: kategoriBaru,
                 desc: deskripsiBaru
             };
@@ -131,17 +145,17 @@ window.simpanHasilEdit = function(id) {
 
     localStorage.setItem('properties', JSON.stringify(globalProperties));
     alert("Perubahan unit sukses disimpan!");
-    loadAdminProperties(); // Muat ulang tampilan data
+    loadAdminProperties();
 };
 
-// === 🔄 FITUR UPDATE STATUS CEPAT ===
+// === FITUR UPDATE STATUS CEPAT ===
 window.updatePropertyStatus = function(id, newStatus) {
     globalProperties = globalProperties.map(p => p.id === id ? { ...p, status: newStatus } : p);
     localStorage.setItem('properties', JSON.stringify(globalProperties));
     alert(`Status kamar berhasil diperbarui!`);
 };
 
-// === ❌ FITUR HAPUS DATA (DELETE) ===
+// === FITUR HAPUS DATA ===
 window.deleteProperty = function(id) {
     if (confirm("Hapus unit ini dari website secara permanen?")) {
         globalProperties = globalProperties.filter(p => p.id !== id);
