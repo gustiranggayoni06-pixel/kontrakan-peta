@@ -3,167 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Control Admin - KontrakanMaps</title>
+    <title>KontrakanMaps - Cari Lokasi Kontrakan Realtime</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-50 text-slate-800 font-sans">
 
-    <div id="login-box" class="w-full max-w-sm bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
-        <div class="text-center mb-6">
-            <i class="fa-solid fa-lock text-3xl text-indigo-400 mb-2"></i>
-            <h1 class="text-xl font-black text-white">Admin Login</h1>
-        </div>
-        <form id="login-form" class="space-y-4">
-            <div>
-                <label class="text-xs text-slate-300 font-semibold block mb-1">Username</label>
-                <input type="text" id="username" required value="admin" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div>
-                <label class="text-xs text-slate-300 font-semibold block mb-1">Password</label>
-                <input type="password" id="password" required value="123" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md transition-all">Masuk Dashboard</button>
-        </form>
-    </div>
-
-    <div id="admin-dashboard" class="w-full max-w-4xl bg-slate-800 rounded-2xl border border-slate-700 p-5 shadow-2xl hidden my-4">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-5">
-            <h1 class="text-lg font-black text-white flex items-center gap-2">
-                <i class="fa-solid fa-sliders text-indigo-400"></i> Penguasa Panel Admin
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-[1000] px-4 py-3 shadow-sm">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-black text-indigo-600 flex items-center gap-2">
+                <i class="fa-solid fa-location-dot text-red-500"></i> KontrakanMaps
             </h1>
-            <button onclick="location.reload()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">Logout</button>
+            <span class="bg-rose-50 text-rose-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                Lokasi Realtime Karawang <i class="fa-solid fa-thumbtack text-rose-400"></i>
+            </span>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 space-y-6">
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div id="map" class="w-full h-[380px] rounded-xl z-10"></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div class="md:col-span-1 bg-slate-700/30 p-4 rounded-xl border border-slate-700/60 h-fit space-y-3">
-                <h2 class="text-sm font-bold text-white border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-plus text-emerald-400"></i> Tambah Unit Baru
-                </h2>
-                <form id="add-property-form" class="space-y-3 text-slate-200">
-                    <div>
-                        <label class="text- text-slate-400 block mb-0.5">Nama Kamar / Unit</label>
-                        <input type="text" id="prop-name" required placeholder="Contoh: Kamar AC No 05" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="text- text-slate-400 block mb-0.5">Harga Sewa Bulanan</label>
-                        <input type="number" id="prop-price" required placeholder="650000" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="text- text-slate-400 block mb-0.5">Kategori Fasilitas</label>
-                        <input type="text" id="prop-category" required placeholder="Kamar Mandi Dalam / AC" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
-                    </div>
-                    
-                    <div>
-                        <label class="text- text-indigo-300 font-bold block mb-0.5">📸 Upload Foto Kontrakan:</label>
-                        <input type="file" id="prop-files" multiple accept="image/*" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded-lg text-xs text-white cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text- file:bg-indigo-600 file:text-white">
-                        <div id="preview-foto" class="flex gap-2 mt-2 flex-wrap"></div>
-                    </div>
+        <div>
+            <h2 class="text-lg font-extrabold text-slate-800 border-l-4 border-indigo-600 pl-2 mb-4">
+                Unit Rekomendasi Kontrakan
+            </h2>
+            <div id="properties-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
 
-                    <div>
-                        <label class="text- text-slate-400 block mb-0.5">Fasilitas Lengkap / Deskripsi</label>
-                        <textarea id="prop-desc" required placeholder="Sebutkan kasur, lemari, listrik token, dll..." class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white h-20 focus:outline-none"></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition-all shadow-md">Publish Unit Kontrakan</button>
-                </form>
+        <div id="form-booking" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm max-w-lg mx-auto">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                📋 Form Booking & Survei Kontrakan
+            </h2>
+            <form id="booking-form-wa" class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Unit Kontrakan Terpilih</label>
+                    <input type="text" id="unit-terpilih" readonly placeholder="Klik tombol 'Sewa' pada unit di atas" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-sm font-medium text-indigo-600 focus:outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Nama Lengkap Anda</label>
+                    <input type="text" id="tenant-name" required placeholder="Masukkan nama lengkap Anda" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">No. WhatsApp Anda</label>
+                    <input type="tel" id="tenant-phone" required placeholder="Contoh: 081234567xxx" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Kirim via WhatsApp ke Pemilik
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <div id="detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-2xl rounded-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 sticky top-0 rounded-t-2xl z-10">
+                <h3 id="modal-title" class="font-bold text-slate-800 text-base">Detail Kontrakan</h3>
+                <button onclick="window.tutupModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <div class="md:col-span-2 space-y-3">
-                <h2 class="text-sm font-bold text-white border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
-                    <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Inventori Unit Website Anda
-                </h2>
-                <div id="admin-properties-list" class="max-h- overflow-y-auto pr-1 space-y-3"></div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <span class="text-xs font-bold text-slate-500 block mb-2">📸 Foto Unit Hasil Upload:</span>
+                    <div id="modal-gallery" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+                </div>
+                <div class="space-y-2 border-t border-slate-100 pt-3">
+                    <p class="text-xs text-indigo-600 font-bold" id="modal-category"></p>
+                    <p class="text-xl font-black text-emerald-600" id="modal-price"></p>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-700 block mb-1">📋 Fasilitas Lengkap:</span>
+                        <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line" id="modal-desc"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex gap-2 rounded-b-2xl">
+                <button id="modal-btn-booking" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-md">
+                    📝 Ajukan Sewa & Survei Unit Ini
+                </button>
             </div>
         </div>
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
-    const loginBox = document.getElementById('login-box');
-    const dashboard = document.getElementById('admin-dashboard');
-    const addForm = document.getElementById('add-property-form');
-    const fileInput = document.getElementById('prop-files');
-    const previewContainer = document.getElementById('preview-foto');
-    const listContainer = document.getElementById('admin-properties-list');
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    // INI PENGGANTI index.js - LANGSUNG DI HTML
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. INIT MAP KARAWANG
+        const map = L.map('map').setView([-6.3227, 107.3376], 13); // Koordinat Karawang
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    let properties = JSON.parse(localStorage.getItem('kontrakanData')) || [];
-    let tempImages = [];
+        const listContainer = document.getElementById('properties-list');
+        const modal = document.getElementById('detail-modal');
+        const formBooking = document.getElementById('booking-form-wa');
+        const inputUnitTerpilih = document.getElementById('unit-terpilih');
 
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === '123') {
-            loginBox.classList.add('hidden');
-            dashboard.classList.remove('hidden');
-            renderList();
-        } else {
-            alert('Username / Password salah bang!');
+        // 2. AMBIL DATA DARI ADMIN PANEL - localStorage
+        let properties = JSON.parse(localStorage.getItem('kontrakanData')) || [];
+
+        // Kalo kosong, kasih data dummy biar nggak blank
+        if (properties.length === 0) {
+            properties = [
+                {
+                    id: 1,
+                    name: "Kamar AC No 05 - Contoh",
+                    price: "650000",
+                    category: "Kamar Mandi Dalam + AC",
+                    desc: "Kasur, Lemari, Listrik Token, WiFi, Parkir Motor",
+                    images: ["https://placehold.co/600x400/4f46e5/white?text=Foto+Kontrakan"],
+                    lat: -6.325,
+                    lng: 107.340
+                }
+            ];
         }
-    });
 
-    fileInput.addEventListener('change', async () => {
-        previewContainer.innerHTML = '';
-        tempImages = [];
-        for (const file of fileInput.files) {
-            const base64 = await toBase64(file);
-            tempImages.push(base64);
-            previewContainer.innerHTML += `<img src="${base64}" class="w-16 h-16 object-cover rounded-lg border border-slate-600">`;
-        }
-    });
+        // 3. RENDER LIST + MARKER MAP
+        function renderProperties() {
+            listContainer.innerHTML = '';
 
-    addForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (tempImages.length === 0) return alert('Upload minimal 1 foto bang');
-        const newUnit = {
-            id: Date.now(),
-            name: document.getElementById('prop-name').value,
-            price: document.getElementById('prop-price').value,
-            category: document.getElementById('prop-category').value,
-            desc: document.getElementById('prop-desc').value,
-            images: tempImages
-        };
-        properties.unshift(newUnit);
-        localStorage.setItem('kontrakanData', JSON.stringify(properties));
-        addForm.reset(); previewContainer.innerHTML = ''; tempImages = [];
-        renderList(); alert('Unit berhasil dipublish!');
-    });
+            properties.forEach(prop => {
+                // Tambah marker ke map
+                const marker = L.marker([prop.lat || -6.3227, prop.lng || 107.3376]).addTo(map);
+                marker.bindPopup(`<b>${prop.name}</b><br>Rp ${Number(prop.price).toLocaleString('id-ID')}/bulan`);
 
-    function renderList() {
-        listContainer.innerHTML = '';
-        if (properties.length === 0) return listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Belum ada unit.</p>';
-        properties.forEach(prop => {
-            listContainer.innerHTML += `
-                <div class="bg-slate-700/50 p-3 rounded-xl border border-slate-700 flex gap-3">
-                    <img src="${prop.images[0]}" class="w-20 h-20 object-cover rounded-lg flex-shrink-0">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-sm font-bold text-white truncate">${prop.name}</h3>
-                            <button onclick="hapusUnit(${prop.id})" class="text-rose-500 hover:text-rose-400 ml-2"><i class="fa-solid fa-trash text-xs"></i></button>
+                // Bikin card unit
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden';
+                card.innerHTML = `
+                    <img src="${prop.images[0]}" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <p class="text-xs text-indigo-600 font-bold">${prop.category}</p>
+                        <h3 class="font-bold text-slate-800 text-sm mt-1 mb-2 truncate">${prop.name}</h3>
+                        <p class="text-lg font-black text-emerald-600 mb-3">Rp ${Number(prop.price).toLocaleString('id-ID')}<span class="text-xs text-slate-500 font-normal">/bulan</span></p>
+                        <div class="flex gap-2">
+                            <button onclick="bukaModal(${prop.id})" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-lg">Detail</button>
+                            <button onclick="pilihUnit('${prop.name}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-lg">Sewa</button>
                         </div>
-                        <p class="text-xs text-emerald-400 font-semibold">Rp ${Number(prop.price).toLocaleString('id-ID')}/bulan</p>
-                        <p class="text- text-slate-400">${prop.category}</p>
-                        <p class="text- text-indigo-400">${prop.images.length} Foto</p>
                     </div>
-                </div>`;
-        });
-    }
-    window.hapusUnit = (id) => {
-        if (confirm('Yakin mau hapus?')) {
-            properties = properties.filter(p => p.id !== id);
-            localStorage.setItem('kontrakanData', JSON.stringify(properties));
-            renderList();
+                `;
+                listContainer.appendChild(card);
+            });
         }
-    };
-    function toBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
+
+        // 4. FUNGSI BUKA MODAL DETAIL
+        window.bukaModal = (id) => {
+            const prop = properties.find(p => p.id === id);
+            if (!prop) return;
+
+            document.getElementById('modal-title').textContent = prop.name;
+            document.getElementById('modal-category').textContent = prop.category;
+            document.getElementById('modal-price').textContent = `Rp ${Number(prop.price).toLocaleString('id-ID')} / bulan`;
+            document.getElementById('modal-desc').textContent = prop.desc;
+
+            // Gallery foto
+            const gallery = document.getElementById('modal-gallery');
+            gallery.innerHTML = '';
+            prop.images.forEach(img => {
+                gallery.innerHTML += `<img src="${img}" class="w-full h-28 object-cover rounded-lg">`;
+            });
+
+            // Tombol booking di modal
+            document.getElementById('modal-btn-booking').onclick = () => {
+                pilihUnit(prop.name);
+                tutupModal();
+                document.getElementById('form-booking').scrollIntoView({ behavior: 'smooth' });
+            };
+
+            modal.classList.remove('hidden');
+        };
+
+        // 5. FUNGSI TUTUP MODAL
+        window.tutupModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        // 6. FUNGSI PILIH UNIT BUAT BOOKING
+        window.pilihUnit = (namaUnit) => {
+            inputUnitTerpilih.value = namaUnit;
+            document.getElementById('form-booking').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // 7. SUBMIT FORM KE WA
+        formBooking.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const unit = inputUnitTerpilih.value;
+            const nama = document.getElementById('tenant-name').value;
+            const hp = document.getElementById('tenant-phone').value;
+
+            if (!unit) return alert('Pilih unit dulu bang, klik tombol Sewa di unit');
+
+            const noPemilik = '6281234567890'; // GANTI NO WA PEMILIK DISINI
+            const pesan = `Halo, saya ${nama} mau booking/survei unit:\n\n*${unit}*\n\nNo WA saya: ${hp}\n\nMohon infonya ya. Terima kasih.`;
+            const urlWA = `https://wa.me/${noPemilik}?text=${encodeURIComponent(pesan)}`;
+
+            window.open(urlWA, '_blank');
         });
-    }
-    renderList();
-});
-</script>
+
+        // JALANKAN PERTAMA KALI
+        renderProperties();
+    });
+    </script>
 </body>
 </html>
