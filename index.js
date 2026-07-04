@@ -7,7 +7,7 @@ const dataKontrakan = [
         fasilitas: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi",
         lat: -6.3388566,  // 📌 Koordinat Akurat Anda
         lng: 107.2686087, // 📌 Koordinat Akurat Anda
-        whatsapp: "6283157363740" // Ganti dengan nomor WhatsApp Pak David aktif (Gunakan awalan 62)
+        whatsapp: "6281381767806" // Ganti dengan nomor WhatsApp Pak David aktif (Gunakan awalan 62)
     },
     {
         id: 2,
@@ -16,7 +16,7 @@ const dataKontrakan = [
         fasilitas: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi",
         lat: -6.3388566,  // 📌 Disamakan agar pin berada di lokasi bangunan yang sama
         lng: 107.2686087, 
-        whatsapp: "6283157363740" 
+        whatsapp: "6281381767806" 
     }
 ];
 
