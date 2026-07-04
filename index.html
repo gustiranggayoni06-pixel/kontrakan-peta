@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-       .leaflet-container { z-index: 1!important; }
-        header { z-index: 10!important; }
+      .leaflet-container { z-index: 1!important; }
+       header { z-index: 10!important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
@@ -98,7 +98,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const map = L.map('map').setView([-6.3227, 107.3376], 13);
+        const map = L.map('map').setView([-6.3388122, 107.266105], 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         const listContainer = document.getElementById('properties-list');
