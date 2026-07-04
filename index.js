@@ -5,11 +5,13 @@ let map;
 let markerGroup;
 let dataKontrakan = [];
 
+// Membaca data yang diatur dari panel admin secara berkala
 function muatDataKontrakan() {
     const stored = localStorage.getItem('properties');
     if (stored) {
         dataKontrakan = JSON.parse(stored);
     } else {
+        // Fallback default jika LocalStorage kosong
         dataKontrakan = [
             { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia" },
             { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia" }
@@ -20,29 +22,40 @@ function muatDataKontrakan() {
 }
 
 function renderPetaDanList() {
+    // Inisialisasi Peta Leaflet secara aman
     const mapElement = document.getElementById('map') || document.getElementById('admin-map');
     if (mapElement && !map) {
         map = L.map(mapElement).setView([PERMANENT_LAT, PERMANENT_LNG], 16);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
         markerGroup = L.layerGroup().addTo(map);
     } else if (markerGroup) {
         markerGroup.clearLayers();
     }
 
+    // Menargetkan kontainer list kartu rekomendasi kontrakan
     const containerDaftar = document.getElementById('daftar-kontrakan') || document.getElementById('properties-list') || document.querySelector('.grid');
     if (containerDaftar) {
         containerDaftar.innerHTML = '';
     }
 
     dataKontrakan.forEach(unit => {
+        // Pasang Pin Marker di Peta
         if (markerGroup) {
             const marker = L.marker([PERMANENT_LAT, PERMANENT_LNG]).addTo(markerGroup);
-            marker.bindPopup(`<b>${unit.name}</b><br>Rp ${Number(unit.price).toLocaleString('id-ID')}/bln`);
+            marker.bindPopup(`
+                <div style="color: #333; font-family: sans-serif;">
+                    <strong style="color: #4f46e5;">${unit.name}</strong><br>
+                    <span style="color: #16a34a; font-weight: bold;">Rp ${Number(unit.price).toLocaleString('id-ID')}/bln</span>
+                </div>
+            `);
         }
 
+        // Render Kartu Informasi ke HTML
         if (containerDaftar) {
             containerDaftar.innerHTML += `
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between mb-4" style="color: #333;">
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between mb-4" style="color: #333; text-align: left;">
                     <div>
                         <div class="flex justify-between items-start gap-2">
                             <h3 class="font-bold text-gray-800 text-base leading-tight">${unit.name}</h3>
@@ -65,7 +78,7 @@ function renderPetaDanList() {
     });
 }
 
-// Fungsi pembantu agar Klik tombol Sewa otomatis memasukkan nama unit ke input form booking Anda
+// Fungsi otomatisasi pemindahan nama unit ke dalam form booking
 window.pilihUnitBooking = function(namaUnit) {
     const inputUnit = document.getElementById('unit-terpilih') || document.querySelector('input[placeholder*="Sewa"]');
     const formBooking = document.getElementById('form-booking') || document.querySelector('form');
