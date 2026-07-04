@@ -3,79 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Control Admin Kontrakan</title>
+    <title>Master Control Admin - KontrakanMaps</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link class="js-leaflet-css" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style> #admin-map { height: 200px; width: 100%; z-index: 5; } </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
 
-    <div id="login-box" class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
+    <div id="login-box" class="w-full max-w-sm bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
         <div class="text-center mb-6">
-            <i class="fa-solid fa-lock-open text-3xl text-indigo-400 mb-2"></i>
-            <h2 class="text-2xl font-bold">Admin Login</h2>
-            <p class="text-xs text-slate-400 mt-1">Gunakan akun default untuk masuk</p>
+            <i class="fa-solid fa-lock text-3xl text-indigo-400 mb-2"></i>
+            <h1 class="text-xl font-black text-white">Admin Login</h1>
+            <p class="text-xs text-slate-400 mt-1">Gunakan akun default untuk masuk panel</p>
         </div>
         <form id="login-form" class="space-y-4">
-            <input type="text" id="username" placeholder="Username (admin)" class="w-full bg-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none border border-transparent focus:border-indigo-500 text-sm" required>
-            <input type="password" id="password" placeholder="Password (password123)" class="w-full bg-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none border border-transparent focus:border-indigo-500 text-sm" required>
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl font-bold text-sm transition shadow-lg">Masuk Dashboard</button>
+            <div>
+                <label class="text-xs text-slate-300 font-semibold block mb-1">Username</label>
+                <input type="text" id="username" required placeholder="admin" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-white">
+            </div>
+            <div>
+                <label class="text-xs text-slate-300 font-semibold block mb-1">Password</label>
+                <input type="password" id="password" required placeholder="••••••••" class="w-full bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-white">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition-all text-sm shadow-md">
+                Masuk Dashboard
+            </button>
         </form>
     </div>
 
-    <div id="admin-dashboard" class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-7xl border border-slate-700 hidden">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
+    <div id="admin-dashboard" class="w-full max-w-4xl bg-slate-800 rounded-2xl border border-slate-700 p-5 shadow-2xl hidden my-4">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-5">
             <div>
-                <h2 class="text-xl font-extrabold text-white flex items-center gap-2">🏠 Panel Kendali Kontrakan</h2>
-                <p class="text-xs text-slate-400">Atur unit kontrakan & koordinat peta disini</p>
+                <h1 class="text-lg font-black text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-indigo-400"></i> Penguasa Panel Admin
+                </h1>
+                <p class="text-[11px] text-slate-400">Tambah, ubah data harga/fasilitas, dan hapus unit langsung dari sini</p>
             </div>
-            <button onclick="window.location.reload()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md">Logout</button>
+            <button onclick="location.reload()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
+                Logout <i class="fa-solid fa-right-from-bracket ml-0.5"></i>
+            </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="space-y-4">
-                <!-- Ganti bagian Form di admin.html Anda dengan ini -->
-<form id="add-property-form" class="space-y-3 bg-slate-900/50 p-4 rounded-xl border border-slate-700">
-    <h3 class="font-bold text-sm text-indigo-400 mb-1"><i class="fa-solid fa-circle-plus"></i> Pasang Iklan Baru (Lokasi Permanen)</h3>
-    
-    <input type="text" id="prop-name" placeholder="Nama Kontrakan / No Kamar" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600" required>
-    
-    <input type="number" id="prop-price" placeholder="Harga Sewa Bulanan (Rp)" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600" required>
-    
-    <select id="prop-category" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600">
-        <option value="1-kamar">Tipe 1 Kamar</option>
-        <option value="paviliun">Tipe Paviliun</option>
-        <option value="rumah-full">Rumah Penuh</option>
-    </select>
-    
-    <textarea id="prop-desc" placeholder="Deskripsi & fasilitas..." rows="2" class="w-full bg-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none border border-slate-600"></textarea>
-    
-    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 py-2 rounded-xl text-xs font-bold text-white transition shadow-md">Publish Unit Baru</button>
-</form>
-
-<!-- Live Map Preview (Tetap dipertahankan untuk melihat titik permanen) -->
-<div class="bg-slate-900/40 p-2 rounded-xl border border-slate-700">
-    <p class="text-[11px] font-bold text-slate-400 mb-1.5"><i class="fa-solid fa-map-pin text-indigo-400"></i> Lokasi Permanen Kontrakan:</p>
-    <div id="admin-map" class="rounded-lg overflow-hidden border border-slate-600"></div>
-</div>
-
-                <div class="bg-slate-900/40 p-2 rounded-xl border border-slate-700">
-                    <p class="text-[11px] font-bold text-slate-400 mb-1.5"><i class="fa-solid fa-map-pin text-indigo-400"></i> Deteksi Alamat Live di Map:</p>
-                    <div id="admin-map" class="rounded-lg overflow-hidden border border-slate-600"></div>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="md:col-span-1 bg-slate-700/30 p-4 rounded-xl border border-slate-700/60 h-fit space-y-3">
+                <h2 class="text-sm font-bold text-white flex items-center gap-1.5 border-b border-slate-700 pb-1.5">
+                    <i class="fa-solid fa-circle-plus text-emerald-400"></i> Tambah Unit Baru
+                </h2>
+                <form id="add-property-form" class="space-y-3 text-slate-200">
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Nama Kamar / Unit</label>
+                        <input type="text" id="prop-name" required placeholder="Contoh: Kamar AC No 05" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Harga Sewa Bulanan (Angka Saja)</label>
+                        <input type="number" id="prop-price" required placeholder="650000" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Kategori Fasilitas</label>
+                        <input type="text" id="prop-category" required placeholder="Contoh: Kamar Mandi Dalam / AC" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-0.5">Fasilitas Lengkap / Deskripsi</label>
+                        <textarea id="prop-desc" required placeholder="Sebutkan kasur, lemari, listrik token, dll..." class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white h-16 focus:outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition-all shadow">
+                        Publish Unit Kontrakan
+                    </button>
+                </form>
             </div>
 
-            <div class="lg:col-span-2">
-                <h3 class="font-bold text-sm text-amber-400 mb-3"><i class="fa-solid fa-warehouse"></i> Inventori Unit Kontrakan</h3>
-                <div id="admin-properties-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[520px] overflow-y-auto pr-1"></div>
-            </div>
-
-            <div>
-                <h3 class="font-bold text-sm text-sky-400 mb-3"><i class="fa-solid fa-bell"></i> Pengajuan Survei Masuk</h3>
-                <div id="admin-bookings-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-1"></div>
+            <div class="md:col-span-2 space-y-3">
+                <h2 class="text-sm font-bold text-white flex items-center gap-1.5 border-b border-slate-700 pb-1.5">
+                    <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Inventori Unit Website Anda
+                </h2>
+                <div id="admin-properties-list" class="max-h-[500px] overflow-y-auto pr-1">
+                    </div>
             </div>
         </div>
     </div>
