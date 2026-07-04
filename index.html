@@ -3,85 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KontrakanMaps - Cari Lokasi Kontrakan</title>
-    <!-- Tailwind CSS untuk Desain -->
+    <title>KontrakanMaps - Cari Lokasi Kontrakan Realtime</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leaflet CSS untuk Peta -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        #map { height: 450px; width: 100%; border-radius: 0.75rem; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-slate-50 text-slate-800 font-sans">
 
-    <!-- Navbar -->
-    <nav class="bg-white shadow-sm p-4 mb-6 border-b border-gray-100">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-[1000] px-4 py-3 shadow-sm">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold text-indigo-600 flex items-center gap-2">
-                📍 KontrakanMaps
+            <h1 class="text-xl font-black text-indigo-600 flex items-center gap-2">
+                <i class="fa-solid fa-location-dot text-red-500"></i> KontrakanMaps
             </h1>
-            <span class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                Lokasi Realtime Karawang 📌
+            <span class="bg-rose-50 text-rose-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                Lokasi Realtime Karawang <i class="fa-solid fa-thumbtack text-rose-400"></i>
             </span>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12">
+    <main class="max-w-6xl mx-auto p-4 space-y-6">
         
-        <!-- Kolom Kiri: Peta & Rekomendasi -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Wadah Peta -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                <div id="map" class="shadow-inner z-10"></div>
-            </div>
-
-            <!-- Daftar Unit Rekomendasi -->
-            <div>
-                <h2 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-indigo-600 pl-2">
-                    Unit Rekomendasi Kontrakan
-                </h2>
-                <div id="daftar-kontrakan" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Data otomatis diisi oleh index.js -->
-                </div>
-            </div>
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div id="map" class="w-full h-[380px] rounded-xl z-10"></div>
         </div>
 
-        <!-- Kolom Kanan: Form Booking -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-fit sticky top-6">
-            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <div>
+            <h2 class="text-lg font-extrabold text-slate-800 border-l-4 border-indigo-600 pl-2 mb-4">
+                Unit Rekomendasi Kontrakan
+            </h2>
+            <div id="properties-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
+        </div>
+
+        <div id="form-booking" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm max-w-lg mx-auto">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                 📋 Form Booking Survei
             </h2>
-            <form id="form-booking" class="space-y-4">
+            <form id="booking-form-wa" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Unit Terpilih</label>
-                    <input type="text" id="unit-terpilih" readonly 
-                        class="w-full p-2.5 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 font-medium outline-none" 
-                        placeholder="Klik tombol 'Sewa & Survei' pada unit">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Unit Terpilih</label>
+                    <input type="text" id="unit-terpilih" readonly placeholder="Klik tombol 'Sewa & Survei' pada unit di atas" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-sm focus:outline-none font-medium text-indigo-600">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Anda</label>
-                    <input type="text" id="nama-pencari" required 
-                        class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
-                        placeholder="Masukkan nama lengkap">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Nama Anda</label>
+                    <input type="text" id="tenant-name" required placeholder="Masukkan nama lengkap" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">No. WhatsApp Anda</label>
-                    <input type="tel" id="wa-pencari" placeholder="Contoh: 08123456xxx" required 
-                        class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">No. WhatsApp Anda</label>
+                    <input type="tel" id="tenant-phone" required placeholder="Contoh: 08123456xxx" class="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <button type="submit" 
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-3 rounded-lg transition-colors shadow-sm mt-2">
-                    Kirim via WhatsApp ke Pemilik
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Kirim via WhatsApp ke Pemilik
                 </button>
             </form>
         </div>
-
     </main>
 
-    <!-- Leaflet JS untuk Peta -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Berkas Logika JavaScript -->
     <script src="index.js"></script>
 </body>
 </html>
