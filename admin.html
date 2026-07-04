@@ -8,12 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-       .leaflet-container { z-index: 1!important; }
+      .leaflet-container { z-index: 1!important; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
 
-    <!-- LOGIN -->
     <div id="login-box" class="w-full max-w-sm bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
         <div class="text-center mb-6">
             <i class="fa-solid fa-lock text-3xl text-indigo-400 mb-2"></i>
@@ -33,7 +32,6 @@
         </form>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="admin-dashboard" class="w-full max-w-7xl bg-slate-800 rounded-2xl border border-slate-700 p-5 shadow-2xl hidden my-4">
         <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-5">
             <div>
@@ -48,7 +46,6 @@
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-5 gap-5">
-            <!-- FORM TAMBAH -->
             <div class="xl:col-span-2 bg-slate-700/30 p-4 rounded-xl border border-slate-700/60 h-fit space-y-3">
                 <h2 class="text-sm font-bold text-white border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-plus text-emerald-400"></i> Tambah Unit Baru
@@ -58,7 +55,7 @@
                         <label class="text-xs text-slate-400 block mb-0.5">Nama Kamar / Unit *</label>
                         <input type="text" id="prop-name" required placeholder="Contoh: Kamar AC No 05" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
                     </div>
-                    
+
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="text-xs text-slate-400 block mb-0.5">Harga / Bulan *</label>
@@ -78,7 +75,7 @@
                         <label class="text-xs text-slate-400 block mb-0.5">Alamat Lengkap *</label>
                         <input type="text" id="prop-address" required placeholder="Jl. Tuparev No. 45, Karawang" class="w-full bg-slate-700 border border-slate-600 p-2 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
                     </div>
-                    
+
                     <div>
                         <label class="text-xs text-indigo-300 font-bold block mb-0.5">📸 Upload Foto (Max 5MB/foto):</label>
                         <input type="file" id="prop-files" multiple accept="image/*" class="w-full bg-slate-700 border border-slate-600 p-1.5 rounded-lg text-xs text-white cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-600 file:text-white">
@@ -111,7 +108,6 @@
                 </form>
             </div>
 
-            <!-- LIST UNIT -->
             <div class="xl:col-span-3 space-y-3">
                 <h2 class="text-sm font-bold text-white border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-boxes-stacked text-indigo-400"></i> Total Unit: <span id="total-unit">0</span>
@@ -166,14 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function initMap() {
-        map = L.map('map-picker').setView([-6.3227, 107.3376], 13);
+        map = L.map('map-picker').setView([-6.3388122, 107.266105], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        
+
         map.on('click', (e) => {
             const { lat, lng } = e.latlng;
             latInput.value = lat.toFixed(6);
             lngInput.value = lng.toFixed(6);
-            
+
             if (marker) map.removeLayer(marker);
             marker = L.marker([lat, lng]).addTo(map);
         });
@@ -212,10 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         if (tempImages.length === 0) return alert('Upload minimal 1 foto');
         if (!latInput.value ||!lngInput.value) return alert('Klik di peta dulu buat nentuin lokasi');
-        
+
         const priceValue = priceInput.value.replace(/\D/g, '');
         if(!priceValue || priceValue < 100000) return alert('Harga minimal Rp 100.000');
-        
+
         const newUnit = {
             id: Date.now(),
             name: document.getElementById('prop-name').value,
@@ -230,15 +226,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         properties.unshift(newUnit);
         localStorage.setItem('kontrakanData', JSON.stringify(properties));
-        
-        addForm.reset(); 
-        previewContainer.innerHTML = ''; 
+
+        addForm.reset();
+        previewContainer.innerHTML = '';
         tempImages = [];
         pricePreview.textContent = 'Rp 0';
         latInput.value = '';
         lngInput.value = '';
         if (marker) map.removeLayer(marker);
-        renderList(); 
+        renderList();
         alert('Unit berhasil dipublish!');
     });
 
@@ -246,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalUnit.textContent = properties.length;
         listContainer.innerHTML = '';
         if (properties.length === 0) return listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Belum ada unit.</p>';
-        
+
         properties.forEach(prop => {
             const firstImg = prop.images && prop.images.length > 0? prop.images[0] : 'https://placehold.co/80x80/334155/white?text=No+Img';
             listContainer.innerHTML += `
