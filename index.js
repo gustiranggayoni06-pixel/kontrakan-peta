@@ -4,26 +4,47 @@ const PERMANENT_LNG = 107.2686087;
 
 let map;
 let markerGroup;
-let dataKontrakan = [];
-
-// Gambar fallback jika admin tidak mengisi link gambar
+let db;
 const DEFAULT_IMG = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80";
 
-function muatDataKontrakan() {
-    const stored = localStorage.getItem('properties');
-    if (stored) {
-        dataKontrakan = JSON.parse(stored);
-    } else {
-        dataKontrakan = [
-            { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Kamar Mandi Dalam, Kasur Busa, Lemari Pakaian, Listrik Token, Free WiFi", status: "Tersedia", images: [DEFAULT_IMG] },
-            { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC 1/2 PK, Kamar Mandi Dalam, Kasur Springbed, Meja Kerja, WiFi Kecepatan Tinggi", status: "Tersedia", images: [DEFAULT_IMG] }
-        ];
-        localStorage.setItem('properties', JSON.stringify(dataKontrakan));
+// Inisialisasi Database IndexedDB Aman Gambar Besar
+const request = indexedDB.open("KontrakanMapsDB", 1);
+request.onupgradeneeded = function(e) {
+    db = e.target.result;
+    if (!db.objectStoreNames.contains("properties")) {
+        db.createObjectStore("properties", { keyPath: "id" });
     }
-    renderPetaDanList();
+};
+request.onsuccess = function(e) {
+    db = e.target.result;
+    muatDataKontrakan();
+};
+
+function muatDataKontrakan() {
+    const transaction = db.transaction(["properties"], "readonly");
+    const store = transaction.objectStore("properties");
+    const getAll = store.getAll();
+
+    getAll.onsuccess = function() {
+        let dataKontrakan = getAll.result;
+        
+        // Buat data default super awal jika DB beneran kosong melompong
+        if(dataKontrakan.length === 0) {
+            const defaultData = [
+                { id: 1, name: "Kosan Pak David - Kamar Standard", price: 550000, category: "Kamar Mandi Dalam", desc: "Fasilitas Standard, Kasur, Lemari", status: "Tersedia", images: [] },
+                { id: 2, name: "Kosan Pak David - Kamar Ber-AC", price: 600000, category: "Fasilitas AC", desc: "AC Dingin, Kasur Springbed, Lemari", status: "Tersedia", images: [] }
+            ];
+            const txWrite = db.transaction(["properties"], "readwrite");
+            const storeWrite = txWrite.objectStore("properties");
+            defaultData.forEach(item => storeWrite.put(item));
+            txWrite.oncomplete = () => muatDataKontrakan();
+            return;
+        }
+        renderPetaDanList(dataKontrakan);
+    };
 }
 
-function renderPetaDanList() {
+function renderPetaDanList(data) {
     const mapElement = document.getElementById('map');
     if (mapElement && !map) {
         map = L.map(mapElement).setView([PERMANENT_LAT, PERMANENT_LNG], 16);
@@ -36,14 +57,13 @@ function renderPetaDanList() {
     const containerDaftar = document.getElementById('properties-list');
     if (containerDaftar) containerDaftar.innerHTML = '';
 
-    dataKontrakan.forEach(unit => {
+    data.forEach(unit => {
         if (markerGroup) {
             L.marker([PERMANENT_LAT, PERMANENT_LNG]).addTo(markerGroup)
              .bindPopup(`<b style="color:#4f46e5;">${unit.name}</b><br><b>Rp ${Number(unit.price).toLocaleString('id-ID')}/bln</b>`);
         }
 
-        // Ambil foto pertama untuk cover kartu depan
-        const coverImg = (unit.images && unit.images.length > 0 && unit.images[0] !== "") ? unit.images[0] : DEFAULT_IMG;
+        const coverImg = (unit.images && unit.images.length > 0) ? unit.images[0] : DEFAULT_IMG;
 
         if (containerDaftar) {
             containerDaftar.innerHTML += `
@@ -60,12 +80,12 @@ function renderPetaDanList() {
                             <p class="text-slate-600 text-xs mt-2 mb-3 line-clamp-2"><b>Fasilitas:</b> ${unit.desc}</p>
                         </div>
                         <div class="flex flex-col gap-1.5 border-t border-slate-100 pt-3">
-                            <button onclick="bukaModalDetail(${unit.id})" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-xl transition-all text-center">
+                            <button onclick="bukaModalDetail(${unit.id})" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-xl text-center">
                                 <i class="fa-solid fa-images mr-1"></i> Lihat Detail & Foto (${unit.images ? unit.images.length : 0})
                             </button>
                             <div class="flex gap-1.5">
-                                <button onclick="map.setView([${PERMANENT_LAT}], [${PERMANENT_LNG}], 17)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-xl transition-all">📍 Peta</button>
-                                <button onclick="window.pilihUnitBooking('${unit.name}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition-all">📝 Sewa</button>
+                                <button onclick="map.setView([${PERMANENT_LAT}], [${PERMANENT_LNG}], 17)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-xl">📍 Peta</button>
+                                <button onclick="window.pilihUnitBooking('${unit.name}')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl">📝 Sewa</button>
                             </div>
                         </div>
                     </div>
@@ -74,36 +94,37 @@ function renderPetaDanList() {
     });
 }
 
-// === FUNGSI MODAL POP-UP DETAIL ===
 window.bukaModalDetail = function(id) {
-    const unit = dataKontrakan.find(p => p.id === id);
-    if(!unit) return;
+    const transaction = db.transaction(["properties"], "readonly");
+    const store = transaction.objectStore("properties");
+    const getReq = store.get(id);
 
-    document.getElementById('modal-title').innerText = unit.name;
-    document.getElementById('modal-category').innerText = `Kategori: ${unit.category} | Status: ${unit.status}`;
-    document.getElementById('modal-price').innerText = `Rp ${Number(unit.price).toLocaleString('id-ID')} / bulan`;
-    document.getElementById('modal-desc').innerText = unit.desc;
+    getReq.onsuccess = function() {
+        const unit = getReq.result;
+        if(!unit) return;
 
-    // Render Semua Gambar Tanpa Batas ke Galeri
-    const galleryContainer = document.getElementById('modal-gallery');
-    galleryContainer.innerHTML = '';
-    
-    const fotoList = (unit.images && unit.images.length > 0) ? unit.images : [DEFAULT_IMG];
-    fotoList.forEach(imgUrl => {
-        if(imgUrl.trim() !== "") {
+        document.getElementById('modal-title').innerText = unit.name;
+        document.getElementById('modal-category').innerText = `Kategori: ${unit.category} | Status: ${unit.status}`;
+        document.getElementById('modal-price').innerText = `Rp ${Number(unit.price).toLocaleString('id-ID')} / bulan`;
+        document.getElementById('modal-desc').innerText = unit.desc;
+
+        const galleryContainer = document.getElementById('modal-gallery');
+        galleryContainer.innerHTML = '';
+        
+        const fotoList = (unit.images && unit.images.length > 0) ? unit.images : [DEFAULT_IMG];
+        fotoList.forEach(imgData => {
             galleryContainer.innerHTML += `
                 <div class="bg-slate-100 rounded-lg overflow-hidden border border-slate-200 h-28 shadow-sm">
-                    <img src="${imgUrl}" alt="Foto Unit" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-all" onclick="window.open('${imgUrl}', '_blank')">
+                    <img src="${imgData}" alt="Foto" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-all" onclick="window.open('${imgData}', '_blank')">
                 </div>`;
-        }
-    });
+        });
 
-    document.getElementById('modal-btn-booking').onclick = function() {
-        tutupModal();
-        window.pilihUnitBooking(unit.name);
+        document.getElementById('modal-btn-booking').onclick = function() {
+            tutupModal();
+            window.pilihUnitBooking(unit.name);
+        };
+        document.getElementById('detail-modal').classList.remove('hidden');
     };
-
-    document.getElementById('detail-modal').classList.remove('hidden');
 };
 
 window.tutupModal = function() {
@@ -116,14 +137,11 @@ window.pilihUnitBooking = function(namaUnit) {
     document.getElementById('form-booking').scrollIntoView({ behavior: 'smooth' });
 };
 
-// === ACTION WHATSAPP ===
 document.getElementById('booking-form-wa').addEventListener('submit', function(e) {
     e.preventDefault();
     const unit = document.getElementById('unit-terpilih').value;
     const nama = document.getElementById('tenant-name').value.trim();
     const hp = document.getElementById('tenant-phone').value.trim();
-
-    if(!unit) { alert("Pilih unit kontrakan dulu!"); return; }
 
     const teksWA = `Halo Pak David, saya ingin mengajukan sewa/survei kontrakan.%0A%0A` +
                    `▪️ *Unit Terpilih :* ${unit}%0A` +
@@ -133,5 +151,3 @@ document.getElementById('booking-form-wa').addEventListener('submit', function(e
 
     window.open(`https://api.whatsapp.com/send?phone=${NOMOR_WA_PEMILIK}&text=${teksWA}`, '_blank');
 });
-
-document.addEventListener('DOMContentLoaded', muatDataKontrakan);
